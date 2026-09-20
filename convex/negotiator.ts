@@ -27,7 +27,7 @@ import {
   type PolicedDraft,
 } from "./lib/negotiationPolicy";
 import { MODELS, describeOpenAIError, getOpenAI, requireParsed, withModelFallback } from "./lib/openai";
-import type { ReplyAnalysis } from "./lib/validators";
+import type { DraftSource, ReplyAnalysis } from "./lib/validators";
 
 /*
  * The Negotiator: writes the next email and reads the landlord's answers.
@@ -68,6 +68,8 @@ export const draft = internalAction({
     const asks = chooseAsks(data.renter, data.listing, data.thread);
 
     let written: PolicedDraft | null = null;
+    // Provenance is decided per draft, where the words are produced, so the badge can never claim more than happened.
+    let source: DraftSource = { kind: "template" };
     let fallbackReason = TEMPLATE_RATIONALE;
     // Worst case (two attempts) has to finish inside the drafting watchdog in threads.ts.
     const client = getOpenAI({ timeoutMs: 60_000, maxRetries: 1 });
@@ -80,7 +82,7 @@ export const draft = internalAction({
         fallbackReason = "Template draft: Nestor has reached today's shared limit for tailored drafts.";
       } else {
         try {
-          const { result } = await withModelFallback(MODELS.draft, MODELS.draftFallback, async (model) => {
+          const { result, model: answeredBy } = await withModelFallback(MODELS.draft, MODELS.draftFallback, async (model) => {
             const response = await client.responses.parse({
               model,
               store: false,
@@ -93,7 +95,9 @@ export const draft = internalAction({
             return requireParsed(response, "Draft email");
           });
           written = enforcePolicy(result, context);
-          if (written === null) {
+          if (written !== null) {
+            source = { kind: "openai", model: answeredBy };
+          } else {
             console.warn("Negotiator draft rejected by policy checks; using the template");
             fallbackReason = "Template draft: the tailored version broke one of Nestor's honesty rules, so it was thrown away.";
           }
@@ -119,6 +123,7 @@ export const draft = internalAction({
       subject: written.subject,
       body: written.body,
       rationale: written.rationale,
+      source,
     });
     return null;
   },
@@ -143,7 +148,7 @@ export const handleInbound = internalAction({
     const client = (await limits.limit(ctx, "inboundAnalysis", { key: thread._id })).ok ? getOpenAI() : null;
     if (client) {
       try {
-        const { result } = await withModelFallback(MODELS.extract, MODELS.extractFallback, async (model) => {
+        const { result, model: answeredBy } = await withModelFallback(MODELS.extract, MODELS.extractFallback, async (model) => {
           const response = await client.responses.parse({
             model,
             store: false,
@@ -178,12 +183,13 @@ export const handleInbound = internalAction({
           });
           return requireParsed(response, "Read landlord reply");
         });
-        analysis = toReplyAnalysis(result);
+        analysis = { ...toReplyAnalysis(result), source: "openai", model: answeredBy };
       } catch (e) {
         console.warn(`Reading the landlord reply with OpenAI failed, using pattern matching: ${describeOpenAIError(e)}`);
       }
     }
-    if (analysis === null) analysis = heuristicAnalysis(message.body, { receivedAt, zone, rentAsked });
+    // No key, a spent quota and an OpenAI error all land here, and the row says so.
+    if (analysis === null) analysis = { ...heuristicAnalysis(message.body, { receivedAt, zone, rentAsked }), source: "rules" };
 
     await ctx.runMutation(internal.threads.applyAnalysis, { messageId, analysis });
     return null;

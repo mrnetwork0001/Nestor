@@ -15,7 +15,7 @@ import { getRenter, requireOwned } from "./lib/auth";
 import { agentmailLive, inboundLive } from "./lib/integrations";
 import { limits } from "./lib/limits";
 import { MAX_OUTBOUND_PER_THREAD, ensureDisclosure, policyViolations } from "./lib/negotiationPolicy";
-import { replyAnalysis, type ThreadStage } from "./lib/validators";
+import { draftSource, replyAnalysis, type ThreadStage } from "./lib/validators";
 
 /*
  * One thread is one email conversation between the Negotiator and one
@@ -515,9 +515,11 @@ export const saveDraft = internalMutation({
     subject: v.string(),
     body: v.string(),
     rationale: v.string(),
+    // Optional so a caller that does not know stays valid; the UI then makes no claim.
+    source: v.optional(draftSource),
   },
   returns: v.null(),
-  handler: async (ctx, { threadId, subject, body, rationale }) => {
+  handler: async (ctx, { threadId, subject, body, rationale, source }) => {
     const thread = await ctx.db.get(threadId);
     if (thread === null || OVER.has(thread.stage)) return null;
     const renter = await ctx.db.get(thread.renterId);
@@ -540,6 +542,7 @@ export const saveDraft = internalMutation({
       subject,
       body,
       rationale,
+      draftSource: source,
     });
 
     const queued = renter.autopilot && (await queueDelivery(ctx, renter, thread, messageId, false));
@@ -636,6 +639,18 @@ export const inboundContext = internalQuery({
   },
 });
 
+/** The same concession worded two ways gets the same key: no figures, no filler, no word order. */
+function concessionKey(concession: string): string {
+  const words = concession
+    .toLowerCase()
+    .replace(/\$\s?[\d,.]+/g, " ")
+    .replace(/[^a-z\s]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !["the", "a", "an", "is", "was", "will", "be", "of", "for", "on"].includes(w))
+    .map((w) => w.replace(/^waiv\w*$/, "waived").replace(/^reduc\w*$/, "reduced"));
+  return [...new Set(words)].sort().join(" ") || concession.toLowerCase();
+}
+
 /**
  * Applies what the Negotiator understood from one landlord email. Everything
  * here is reversible bookkeeping: offers are recorded, never accepted, and a
@@ -700,8 +715,16 @@ export const applyAnalysis = internalMutation({
       });
     }
 
-    const known = new Set(thread.concessionsWon.map((c) => c.toLowerCase()));
-    const newConcessions = analysis.concessions.filter((c) => !known.has(c.toLowerCase()));
+    // A later email often restates an earlier concession in other words ("$40 application fee
+    // waived", then "Application fee waived"). Compared without figures or word order, so one
+    // win is not logged twice.
+    const known = new Set(thread.concessionsWon.map(concessionKey));
+    const newConcessions = analysis.concessions.filter((c) => {
+      const key = concessionKey(c);
+      if (known.has(key)) return false;
+      known.add(key);
+      return true;
+    });
     if (newConcessions.length > 0) {
       await logActivity(ctx, { ...base, kind: "landlord", title: `${who} agreed: ${newConcessions.join(", ")}` });
     }

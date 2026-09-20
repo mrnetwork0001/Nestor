@@ -33,15 +33,26 @@ function Fact({ icon, children }: { icon: ReactNode; children: ReactNode }) {
 }
 
 /** Shown on an inbound email while the Negotiator is still parsing it. */
-export function AnalysisPending({ brainLive }: { brainLive: boolean }) {
+export function AnalysisPending(_props: { brainLive?: boolean }) {
+  // Who ends up reading it is not known yet (OpenAI can fail over to pattern matching), so no reader is named here.
   return (
     <div className="flex animate-rise items-center gap-2.5 border-t border-line bg-paper-deep/50 px-4 py-3 text-sm text-ink-soft">
       <Spinner className="size-4" />
-      {brainLive
-        ? "OpenAI is reading this reply for tour times, offers and questions"
-        : "Reading this reply for tour times, offers and questions"}
+      Reading this reply for tour times, offers and questions
     </div>
   );
+}
+
+/**
+ * Says who read the email, from what was recorded on this one result. Rows
+ * saved before the reader was recorded get a neutral label, never a claim.
+ */
+function ReaderBadge({ analysis }: { analysis: Analysis }) {
+  if (analysis.source === "openai") {
+    return <Badge tone="sky">{analysis.model ? `Read by OpenAI (${analysis.model})` : "Read by OpenAI"}</Badge>;
+  }
+  if (analysis.source === "rules") return <Badge tone="honey">Read by pattern matching</Badge>;
+  return <Badge>Reader not recorded</Badge>;
 }
 
 /**
@@ -51,11 +62,11 @@ export function AnalysisPending({ brainLive }: { brainLive: boolean }) {
 export function AnalysisPanel({
   analysis,
   rentAsked,
-  brainLive,
 }: {
   analysis: Analysis;
   rentAsked: number | undefined;
-  brainLive: boolean;
+  // Still passed by the message card, but unused: a key being set says nothing about who read this email.
+  brainLive?: boolean;
 }) {
   const intent = INTENT[analysis.intent];
   const under =
@@ -76,7 +87,7 @@ export function AnalysisPanel({
         </p>
         <Badge tone={intent.tone}>{intent.label}</Badge>
         <Badge>{SENTIMENT[analysis.sentiment]}</Badge>
-        {brainLive && <Badge tone="sky">Parsed with OpenAI</Badge>}
+        <ReaderBadge analysis={analysis} />
       </div>
 
       <p className="mt-2 text-sm leading-relaxed text-ink-soft">{analysis.summary}</p>
@@ -85,7 +96,10 @@ export function AnalysisPanel({
         <ul className="mt-2.5 flex flex-wrap gap-1.5">
           {analysis.rentOffered !== undefined && (
             <Fact icon={<Tag className="size-3.5" />}>
-              {money(analysis.rentOffered)} a month offered
+              {/* A landlord who holds the rent restates the asking price; calling that an offer would read as a win. */}
+              {rentAsked !== undefined && analysis.rentOffered === rentAsked
+                ? `Rent stays at ${money(analysis.rentOffered)} a month`
+                : `${money(analysis.rentOffered)} a month offered`}
               {under > 0 && <span className="text-forest">, {money(under)} under asking</span>}
             </Fact>
           )}

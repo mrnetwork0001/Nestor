@@ -141,6 +141,16 @@ export const replyAnalysis = v.object({
   rentOffered: v.optional(v.number()),
   concessions: v.array(v.string()),
   questionsForRenter: v.array(v.string()),
+  // Who actually read this email, recorded where the reading happens. Optional:
+  // rows saved before provenance was tracked have neither, and the UI makes no claim for them.
+  source: v.optional(v.union(v.literal("openai"), v.literal("rules"))),
+  model: v.optional(v.string()), // the OpenAI model id that answered; only with source "openai"
+});
+
+/** Where a draft's words came from: OpenAI (and which model) or the built-in template. */
+export const draftSource = v.object({
+  kind: v.union(v.literal("openai"), v.literal("template")),
+  model: v.optional(v.string()), // only with kind "openai"
 });
 
 export const tourStatus = v.union(
@@ -192,6 +202,7 @@ export type NegotiationGoal = Infer<typeof negotiationGoal>;
 export type ListingStatus = Infer<typeof listingStatus>;
 export type ThreadStage = Infer<typeof threadStage>;
 export type ReplyAnalysis = Infer<typeof replyAnalysis>;
+export type DraftSource = Infer<typeof draftSource>;
 export type TourSlot = Infer<typeof tourSlot>;
 export type LeaseFlag = Infer<typeof leaseFlag>;
 export type RiskLevel = Infer<typeof riskLevel>;

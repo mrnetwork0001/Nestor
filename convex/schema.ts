@@ -8,6 +8,7 @@ import {
   contactSearchStatus,
   contactSource,
   creditBand,
+  draftSource,
   incomeBand,
   leaseFlag,
   listingFee,
@@ -164,6 +165,8 @@ export default defineSchema({
     agentmailMessageId: v.optional(v.string()),
     // Why the Negotiator wrote what it wrote, shown beside drafts
     rationale: v.optional(v.string()),
+    // Drafts only: whether OpenAI or the template wrote the text. Absent on older rows.
+    draftSource: v.optional(draftSource),
     // Inbound only
     analysis: v.optional(replyAnalysis),
     error: v.optional(v.string()),

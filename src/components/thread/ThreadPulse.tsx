@@ -83,7 +83,8 @@ export function ThreadPulse({
         >
           {status?.openai === false
             ? "OpenAI is not connected here, so this will be a labelled template draft."
-            : "OpenAI is drafting from your Passport facts, this listing and the conversation so far. It usually takes 5 to 20 seconds."}
+            : // Who wrote it is only known once the draft lands (a spent limit or a failed honesty check falls back to the template), and the draft's own badge says which.
+              "Drafting from your Passport facts, this listing and the conversation so far. It usually takes 5 to 20 seconds, and the draft is labelled with who wrote it."}
         </Pulse>
       );
 

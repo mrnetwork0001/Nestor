@@ -22,11 +22,11 @@ function wordCount(text: string): number {
 export function DraftCard({
   message,
   thread,
-  brainLive,
 }: {
   message: Doc<"messages">;
   thread: Doc<"threads">;
-  brainLive: boolean;
+  // Still passed by the conversation view, but no label here depends on it: a key being set says nothing about this draft.
+  brainLive?: boolean;
 }) {
   const approveDraft = useMutation(api.threads.approveDraft);
   const discardDraft = useMutation(api.threads.discardDraft);
@@ -51,8 +51,12 @@ export function DraftCard({
   }, [body]);
 
   const rationale = message.rationale?.trim() ?? "";
-  const isTemplate = rationale.startsWith(TEMPLATE_PREFIX);
-  const afterPrefix = rationale.slice(TEMPLATE_PREFIX.length).trim();
+  // The badge follows what was recorded when this draft was written, never whether a key exists now.
+  // Drafts saved before that was recorded only count as template drafts when their own rationale says so.
+  const source = message.draftSource;
+  const hasPrefix = rationale.startsWith(TEMPLATE_PREFIX);
+  const isTemplate = source !== undefined ? source.kind === "template" : hasPrefix;
+  const afterPrefix = hasPrefix ? rationale.slice(TEMPLATE_PREFIX.length).trim() : rationale;
   const templateNote = afterPrefix.charAt(0).toUpperCase() + afterPrefix.slice(1);
   const edited = subject !== message.subject || body !== message.body;
   const words = wordCount(body);
@@ -117,7 +121,13 @@ export function DraftCard({
           <h3 className="font-sans text-sm font-semibold text-ink">Draft waiting for your OK</h3>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {isTemplate ? <Badge tone="honey">Template draft</Badge> : brainLive && <Badge tone="sky">Written with OpenAI</Badge>}
+          {isTemplate ? (
+            <Badge tone="honey">Template draft</Badge>
+          ) : source?.kind === "openai" ? (
+            <Badge tone="sky">{source.model ? `Written by OpenAI (${source.model})` : "Written by OpenAI"}</Badge>
+          ) : (
+            <Badge>Writer not recorded</Badge>
+          )}
           <Badge>{thread.isSimulated ? "Goes to the demo landlord" : "Goes out by real email"}</Badge>
         </div>
       </header>
