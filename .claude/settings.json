@@ -1,0 +1,12 @@
+{
+  "enabledPlugins": {
+    "convex@claude-plugins-official": true
+  },
+  "permissions": {
+    "deny": [
+      "Read(./.env.keys)",
+      "Edit(./.env.keys)",
+      "Write(./.env.keys)"
+    ]
+  }
+}
