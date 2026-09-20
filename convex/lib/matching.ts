@@ -73,6 +73,8 @@ const AMENITY_IDEAS: Array<{ ask: RegExp; offer: RegExp }> = [
 
 const STOPWORDS = new Set(["the", "and", "with", "for", "near", "close", "good", "nice", "has", "have"]);
 
+const UNKNOWN_BEDS_CEILING = 79;
+
 type PetStance = "allowed" | "restricted" | "none" | "unknown";
 
 function petStance(policy: string | undefined, haystack: string): PetStance {
@@ -214,7 +216,21 @@ export function scoreListing(renter: MatchRenter, listing: MatchListing): MatchR
   }
 
   // Fees. Each one is something the Negotiator can ask to have waived.
-  const relevantFees = fees.filter((f) => renter.pets.hasPets || !/\b(pet|dog|cat)\b/i.test(f.label));
+  // Listings often price dogs and cats separately. Count the renter's own animal only, or the
+  // total overstates what they would pay and the Negotiator would quote a wrong figure.
+  const mine = norm(renter.pets.description ?? "");
+  const hasDog = DOG_WORDS.test(mine);
+  const hasCat = CAT_WORDS.test(mine);
+  const relevantFees = fees.filter((f) => {
+    const label = f.label.toLowerCase();
+    if (!/\b(pets?|dogs?|cats?)\b/.test(label)) return true;
+    if (!renter.pets.hasPets) return false;
+    const forDog = /\bdogs?\b/.test(label);
+    const forCat = /\bcats?\b/.test(label);
+    if (forDog === forCat) return true; // a general pet fee, or one that names both
+    if (hasDog === hasCat) return forDog; // animal unknown, or both: count one species' fees, not two
+    return hasDog ? forDog : forCat;
+  });
   const oneTime = relevantFees.filter((f) => f.cadence !== "monthly" && (f.amount ?? 0) > 0);
   const monthly = relevantFees.filter((f) => f.cadence === "monthly" && (f.amount ?? 0) > 0);
   const oneTimeTotal = oneTime.reduce((sum, f) => sum + (f.amount ?? 0), 0);
@@ -251,7 +267,10 @@ export function scoreListing(renter: MatchRenter, listing: MatchListing): MatchR
   const possible = factors.reduce((sum, f) => sum + f.possible, 0);
   const earned = factors.reduce((sum, f) => sum + f.earned, 0);
   const base = possible === 0 ? 0 : (earned / possible) * 100;
-  const matchScore = Math.max(0, Math.min(100, Math.round(base + (hood ? 4 : 0))));
+  // The board calls 85 and up a "Great match". Without a bedroom count nobody
+  // knows whether the home is big enough, so it can be a good match at most.
+  const ceiling = beds === undefined ? UNKNOWN_BEDS_CEILING : 100;
+  const matchScore = Math.max(0, Math.min(ceiling, Math.round(base + (hood ? 4 : 0))));
 
   return { matchScore, matchReasons: reasons.slice(0, 6), concerns: concerns.slice(0, 6) };
 }

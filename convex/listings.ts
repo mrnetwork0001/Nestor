@@ -472,9 +472,14 @@ export const beginScrape = internalMutation({
 });
 
 export const applyScrape = internalMutation({
-  args: { listingId: v.id("listings"), data: scrapedListing, refresh: v.optional(v.boolean()) },
+  args: {
+    listingId: v.id("listings"),
+    data: scrapedListing,
+    refresh: v.optional(v.boolean()),
+    replaceUnitFacts: v.optional(v.boolean()),
+  },
   returns: v.null(),
-  handler: async (ctx, { listingId, data, refresh }) => {
+  handler: async (ctx, { listingId, data, refresh, replaceUnitFacts }) => {
     const listing = await ctx.db.get(listingId);
     if (listing === null) return null;
     const renter = await ctx.db.get(listing.renterId);
@@ -485,6 +490,13 @@ export const applyScrape = internalMutation({
     const { contactEmail: pageEmail, fees, amenities, photos, ...facts } = data;
     const merged = {
       ...facts,
+      // The exception: bedrooms, bathrooms and size describe one unit. When
+      // the Scout settled them as a set, or the bedroom count changed, a size
+      // or bath count left over from a different floor plan is cleared.
+      ...(replaceUnitFacts === true ||
+      (data.bedrooms !== undefined && listing.bedrooms !== undefined && data.bedrooms !== listing.bedrooms)
+        ? { bedrooms: data.bedrooms, bathrooms: data.bathrooms, sqft: data.sqft }
+        : {}),
       fees: fees.length > 0 ? fees : listing.fees,
       amenities: amenities.length > 0 ? amenities : listing.amenities,
       photos: photos.length > 0 ? photos : listing.photos,

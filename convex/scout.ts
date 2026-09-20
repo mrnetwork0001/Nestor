@@ -148,6 +148,15 @@ async function readPage(ctx: ActionCtx, url: string, options: ScrapeOptions): Pr
   }
 }
 
+// These portals only load the floor plan table, the fees and the pet policy
+// once they scroll into view; until then the page says "One sec, gathering the
+// Policies and fees". Without them the extractor guesses.
+const LAZY_HOSTS = ["zumper.com", "padmapper.com"];
+const SCROLL_THROUGH: unknown[] = Array.from({ length: 10 }).flatMap(() => [
+  { type: "scroll", direction: "down" },
+  { type: "wait", milliseconds: 400 },
+]);
+
 export const scrapeListing = internalAction({
   args: { listingId: v.id("listings"), refresh: v.optional(v.boolean()) },
   returns: v.null(),
@@ -163,6 +172,12 @@ export const scrapeListing = internalAction({
       return null;
     }
 
+    // A building page lists many floor plans; which one the card shows depends
+    // on how many bedrooms this renter needs.
+    const brief: { bedroomsMin: number } | null = await ctx.runQuery(internal.listings.searchBrief, {
+      renterId: job.renterId,
+    });
+
     try {
       const page = await readPage(ctx, job.sourceUrl, {
         formats: [
@@ -171,6 +186,7 @@ export const scrapeListing = internalAction({
           { type: "json", schema: LISTING_JSON_SCHEMA as unknown as Record<string, unknown>, prompt: LISTING_PROMPT },
         ],
         onlyMainContent: true,
+        ...(hostMatches(new URL(job.sourceUrl).hostname, LAZY_HOSTS) ? { actions: SCROLL_THROUGH } : {}),
         timeout: 90_000,
         // A refresh exists to catch price changes, so Firecrawl's cache is no use.
         maxAge: refresh === true ? 0 : HOUR_MS,
@@ -197,10 +213,11 @@ export const scrapeListing = internalAction({
         return null;
       }
 
-      const data = normalizeListing(page.json, {
+      const { listing: data, replaceUnitFacts } = normalizeListing(page.json, {
         title: page.title ?? new URL(job.sourceUrl).hostname,
         images: page.images,
         pageText: page.markdown,
+        bedroomsMin: brief?.bedroomsMin,
       });
       if (looksEmpty(data)) {
         await ctx.runMutation(internal.listings.failScrape, {
@@ -211,7 +228,7 @@ export const scrapeListing = internalAction({
         });
         return null;
       }
-      await ctx.runMutation(internal.listings.applyScrape, { listingId, data, refresh });
+      await ctx.runMutation(internal.listings.applyScrape, { listingId, data, refresh, replaceUnitFacts });
     } catch (err) {
       console.error("Scout: scrape failed", firecrawlFailure(err) ?? (err instanceof Error ? err.message : err));
       await ctx.runMutation(internal.listings.failScrape, { listingId, error: explain(err), refresh });
