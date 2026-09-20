@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { FlaskConical, House } from "@/components/icons";
+import { Binoculars, FlaskConical, House } from "@/components/icons";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { ActivityFeed, LatestActivity } from "@/components/dashboard/ActivityFeed";
@@ -42,9 +42,11 @@ export function Dashboard() {
   const tours = useQuery(api.tours.list);
   const status = useQuery(api.system.status);
   const loadSamples = useMutation(api.listings.loadSamples);
+  const discover = useMutation(api.listings.discover);
 
   const now = useNow(30_000);
   const [loadingSamples, setLoadingSamples] = useState(false);
+  const [discovering, setDiscovering] = useState(false);
 
   useEffect(() => {
     document.title = "Dashboard · Nestor";
@@ -53,6 +55,21 @@ export function Dashboard() {
   const knownListingIds = useMemo(() => new Set<string>((listings ?? []).map((l) => l._id)), [listings]);
   const hasSamples = (listings ?? []).some((l) => l.isSample);
   const scouting = (listings ?? []).filter((l) => l.status === "queued" || l.status === "scouting").length;
+
+  // The empty board leads with real listings: a live web search, not bundled data.
+  async function onDiscover() {
+    if (discovering) return;
+    setDiscovering(true);
+    try {
+      const { demo } = await discover({});
+      if (demo) toast("The Scout is in demo mode, so it loaded sample listings instead of searching the web.");
+      else toast.success(`The Scout is searching${renter?.city ? ` ${renter.city}` : ""}. Real listings appear over the next half minute.`);
+    } catch (error) {
+      toastError(error);
+    } finally {
+      setDiscovering(false);
+    }
+  }
 
   async function onLoadSamples() {
     if (loadingSamples) return;
@@ -110,15 +127,27 @@ export function Dashboard() {
               <EmptyState
                 icon={<House className="size-5" />}
                 title="Your board is empty"
-                body="Paste a listing link above, or load six sample homes with a demo landlord to see the whole flow in two minutes: scouting, the first email, the reply, and a booked tour."
+                body="Let the Scout search the web for real listings that fit your profile, or paste a listing link above. Either way you can run the whole flow with the demo landlord: the first email, the reply, and a booked tour."
                 action={
-                  <Button
-                    onClick={onLoadSamples}
-                    loading={loadingSamples}
-                    icon={<FlaskConical className="size-4" />}
-                  >
-                    Load sample listings
-                  </Button>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <Button
+                      onClick={onDiscover}
+                      loading={discovering}
+                      disabled={loadingSamples}
+                      icon={<Binoculars className="size-4" />}
+                    >
+                      Find real listings for me
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={onLoadSamples}
+                      loading={loadingSamples}
+                      disabled={discovering}
+                      icon={<FlaskConical className="size-4" />}
+                    >
+                      Use sample listings instead
+                    </Button>
+                  </div>
                 }
               />
             ) : (
