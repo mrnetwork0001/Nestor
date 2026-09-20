@@ -8,25 +8,35 @@ Built for the [Convex All Gas Hackathon](https://www.convex.dev/hackathons/all-g
 
 ![Nestor landing page](docs/screenshots/landing.webp)
 
-## Try it in two minutes
+## Try it in a few minutes
 
-No sign-up is needed. Everything below runs on the live URL as a guest.
+No sign-up is needed. Everything below runs on the live URL as a guest, and every step calls a real service.
 
 1. Open https://standing-elephant-306.convex.site, choose **Launch app**, then **Continue as guest**. One click, no form.
-2. Fill in the 3-step onboarding: where you are looking and your budget, your Renter Passport facts, and what you want negotiated (lower rent, a waived fee, a flexible move-in date). It is three short forms.
-3. On the dashboard choose **Load sample listings**. Six listings, shaped around your city and budget, appear one at a time and are scored against your profile. About 7 seconds.
-4. Open a listing and choose **Try it with the demo landlord**. The Negotiator writes a draft and shows its reasoning. About 8 seconds.
-5. Choose **Approve and send**. The email leaves the agent inbox over AgentMail, the demo landlord answers from its own inbox, and the reply comes back through the signed webhook. About 15 seconds. Nestor reads the reply into tour times, offers and open questions. Pick a tour time and watch the card move across the board.
-6. Go to **Lease check** and choose **Try the sample lease**. OpenAI reviews a fictional lease and quotes the clauses worth a second look. About 36 seconds.
-7. Optional: in **Settings**, turn the guest session into an email and password account. Listings, conversations and lease checks stay attached.
+2. Fill in the 3-step onboarding: where you are looking and your budget, your Renter Passport facts, and what you want negotiated (lower rent, a waived fee, a flexible move-in date). Try **Austin, TX**: the portals cover it well.
+3. On the empty board choose **Find real listings for me**. Firecrawl searches the web for your city, beds and budget, and the Scout reads each result into a scored card. The first card is ready in about 15 to 30 seconds. Or paste a listing link into the bar at the top and choose **Scout this listing**, for example `https://www.padmapper.com/buildings/p12116/waller-creekside-apartments-at-105-w-51st-st-austin-tx-78751` (about 7 seconds).
+4. Open a listing and choose **Try it with the demo landlord**. OpenAI writes the first email and shows its reasoning; the draft is labelled with the model that wrote it. About 8 seconds.
+5. Choose **Approve and send**. The email leaves the agent inbox over AgentMail, the demo landlord answers from its own inbox, and the reply comes back through the signed webhook. About 15 seconds. The reply agrees to one thing you asked for and offers two tour times. Nestor reads it into chips, labels who read it, and the **Saved** tile (or **Won**, for a waived fee) moves. Open **Delivery details** under any message to see its AgentMail message id, thread id and timestamp.
+6. Pick a tour time. Nestor drafts the confirmation; approve it and the card moves to **Tour booked**.
+7. Go to **Lease check** and choose **Try the sample lease**. OpenAI reviews a fictional lease and quotes the clauses worth a second look. About 35 to 60 seconds, around 11 clauses; the split varies because the review is live.
+8. Optional: in **Settings**, turn the guest session into an email and password account. Listings, conversations and lease checks stay attached.
 
-Guests talk to a demo landlord. It is labelled as one everywhere, but the mail is real: two AgentMail inboxes exchange actual email, and the reply is parsed by the same code that reads a real landlord's answer. Emailing a real landlord needs a free account, because the site is public and a guest session costs one click to create.
+Guests talk to a demo landlord. It is labelled as one everywhere, but the mail is real: two AgentMail inboxes exchange actual email, and the reply is parsed by the same code that reads a real landlord's answer. Its replies follow a short script (a modest concession tied to the listing's real numbers, then tour times), reworded by OpenAI. No time or no credits? **Use sample listings instead** loads six fictional listings, labelled as samples.
 
-You can also paste a real listing URL (the Scout targets Zumper, PadMapper, Apartment List and Redfin; a PadMapper listing was the one scraped and scored in development) or choose **Find listings for me**. Both call Firecrawl.
+**Want it in your own inbox?** Emailing a real address needs a free account, because the site is public and a guest session costs one click. Create an account, open a real listing, type your own email under **Landlord contact**, choose **Start negotiating**, approve the draft, then reply from your mailbox like a landlord would. Your reply is read into offers, tour times and questions within seconds.
 
-### What was checked on the live site
+### What was checked
 
-Observed on 2026-09-20: the full walk-through above passed in a browser with zero browser errors, including the guest upgrade, sign-out and sign-in with all data intact. The demo landlord's reply was read into two tour times. The sample lease check flagged 11 clauses (7 serious, 4 worth negotiating) and carried the not-legal-advice note. An unsigned POST to `/agentmail/webhook` returns 401. In development, a real PadMapper listing was scraped and scored in about 5 seconds, and Firecrawl search discovered and queued a listing.
+On the live site, 2026-09-20, in a real browser:
+
+- The guest walk-through above, including the guest upgrade, sign-out and sign-in with all data intact, with zero browser errors.
+- An independent audit with a fresh account: pasted PadMapper and Zumper links were each read in about 7 seconds; **Find listings for me** returned 4 real Austin buildings from Redfin in about 26 seconds; the contact lookup found one address that is printed on the property's own contact page, and on a second listing said none was published; a lease PDF written for the test was reviewed in 57 seconds, flagged exactly the 8 unfair clauses planted in it, quoted all 8 word for word and left the 10 normal clauses alone.
+- An unsigned POST to `/agentmail/webhook` returns 401.
+
+The real conversation path, with a landlord who is not the demo landlord:
+
+- **On production, with a personal Gmail mailbox as the landlord.** An account holder pasted a real PadMapper listing, typed a Gmail address under Landlord contact, and approved the draft. The inquiry was delivered by AgentMail to that Gmail account, where **it landed in the spam folder** (see [Known limitations](#known-limitations)). A reply typed in Gmail came back through the signed webhook and was read correctly: a counter-offer of $1,650 against $1,690 asked, a waived application fee, two tour times, and a question about parking that Nestor held for the renter to answer.
+- **On the development deployment, with an outside AgentMail mailbox as the landlord.** A reply typed by hand (a counter-offer of $1,195 against $1,225 asked, a waived application fee, two tour times and a parking question) was read correctly into all four. [convex/auditLandlord.ts](convex/auditLandlord.ts) is the internal helper that plays that landlord, so the test can be repeated.
 
 ## The problem
 
@@ -218,18 +228,18 @@ Two limits to be plain about: the rule against inventing competing offers or urg
 
 ### Abuse controls
 
-The live site is public and a guest session is one click, so everything that spends credits or sends mail is capped with the rate limiter component ([convex/lib/limits.ts](convex/lib/limits.ts)).
+The live site is public and a guest session is one click, so everything that spends credits or sends mail is capped with the rate limiter component ([convex/lib/limits.ts](convex/lib/limits.ts)). The deployment-wide numbers are sized to the project's actual sponsor balances, so one busy day cannot use them up.
 
 | Action | Per renter | Whole deployment |
 | --- | --- | --- |
-| Listing scrapes | 12 per hour, burst 6 | 150 per day |
-| Discovery searches | 4 per hour | 30 per day |
-| Contact lookups | 8 per hour | 40 per day |
-| Drafts | 40 per hour, burst 10 | 300 per day |
-| Email to real landlords | 6 per day | 35 per day |
-| Email to the demo landlord | 12 per day | 50 per day |
-| Lease checks | 5 per day | 25 per day |
-| Sample lease check | 3 per day | 60 per day (then the pre-written review) |
+| Listing scrapes | 12 per hour, burst 6 | 40 per day |
+| Discovery searches | 4 per hour | 10 per day |
+| Contact lookups | 8 per hour | 10 per day |
+| Drafts | 40 per hour, burst 10 | 150 per day |
+| Email to real landlords | 6 per day | 15 per day |
+| Email to the demo landlord | 12 per day | 80 per day |
+| Lease checks | 5 per day | 10 per day |
+| Sample lease check | 3 per day | 25 per day (then the pre-written review) |
 | Upload URLs | 10 per day | 150 per day |
 
 Also: at most 3 emails a day to any one recipient address, counted across all renters. Guests cannot email outside addresses at all: a real conversation is refused unless the listing has a contact email, the renter has an account, and inbound mail can get back in. When a demo conversation is over quota it never blocks. It is delivered inside Convex instead, and the message is labelled as such.
@@ -245,6 +255,12 @@ The public query [renters.passport](convex/renters.ts) returns exactly 15 allow-
 **AgentMail is used two ways on purpose.** In `@agentmail/convex` 0.1.0 the component's HTTP helper reads `AGENTMAIL_API_KEY` from `process.env` inside the component, and the component declares no env that an app could bind. The package README says to set the key on the deployment. A Convex component does not inherit the app's environment, so the variable never reaches it. This was reproduced during research on a local Convex 1.46 deployment: a send was accepted and queued, then every attempt failed with a missing-key error, and `createInbox` could not be resolved from the app because the component exports it as an internal function. Inbound needs no key. So inbound uses the component (signature check helper, dedupe by event id, storage, callback workpool) and outbound uses the REST API directly.
 
 **The Firecrawl JSON schema is written by hand.** The schema crosses a Convex function boundary into the component, and Convex rejects object keys that start with `$`. A generated schema with `$schema`, `$ref` or `$defs` cannot be passed, so [LISTING_JSON_SCHEMA](convex/lib/listingSchema.ts) is plain JSON Schema with nullable types. For the same reason the Scout has a direct-API fallback: when the component call fails for a reason other than a Firecrawl error (page metadata with keys Convex refuses), the same request goes straight to the Firecrawl scrape endpoint.
+
+**Every AI label states what happened, not what is configured.** A reply is labelled "Read by OpenAI" with the model id only when OpenAI's answer was the one used; when a rate limit or an error sent it through the pattern-matching reader, it says so. Drafts are labelled the same way, as written by OpenAI or as a template. Rows saved before this was recorded make no claim. The source is stored on the row in [convex/negotiator.ts](convex/negotiator.ts), and the badges in [AnalysisPanel.tsx](src/components/thread/AnalysisPanel.tsx) and [DraftCard.tsx](src/components/thread/DraftCard.tsx) read it.
+
+**Email delivery is inspectable.** Under every sent or received message, [Delivery details](src/components/thread/DeliveryDetails.tsx) shows the AgentMail message id and thread id, both addresses and the timestamp to the second, so a delivery can be matched in the AgentMail console. A demo message that stayed inside Nestor shows no ids and says no email was sent.
+
+**Building pages are read one floor plan at a time.** A portal page for a whole building lists several floor plans, and an extractor asked for "the rent" and "the bedrooms" will pair the cheapest rent with some other plan's size. The Scout asks for the list of plans and then chooses one in code: the cheapest that meets the renter's minimum bedrooms. Rent, beds, baths and size all come from that plan ([pickFloorPlan](convex/lib/listingSchema.ts)). Zumper loads its plan table only when scrolled into view, so its pages are scraped with scroll actions. When the bedroom count is still unknown the match score is capped and says why. Pet fees priced per animal are counted for the renter's own animal only.
 
 **The icons are drawn for Nestor.** All 71 icons are a custom family based on the logo mark: arched tops like its doorway, one diagonal corner like its roofline, and a single flat tint per glyph. They live in [src/components/icons](src/components/icons) and are exported under the names of the stock library they replaced, so the swap changed one import path per file and nothing else. Two independent reviewers looked at renders of the set and of real screens, and 27 glyphs were redrawn after five failed a "recognise it at 16px" check. A dev-only specimen page lists every icon at `/dev/icons.html`; it is not part of the production build.
 
@@ -360,8 +376,9 @@ Stack: React 19, React Router 7, Vite 8, TypeScript in strict mode, Tailwind CSS
 
 ## Known limitations
 
-- **Real landlords.** The end-to-end run on the live site used the demo landlord. The path to a real landlord shares the same send, webhook and parsing code, but no negotiation with a real landlord is claimed here.
-- **What the live checks covered.** The recorded live run covered the demo landlord walk-through and the bundled sample lease, which is sent as text at medium effort with 16,000 output tokens. Real listing scrapes and discovery search were observed in development only. The uploaded-PDF path (OpenAI Files API, `input_file`, high effort), autopilot, the Scout's contact lookup and the listing re-check cron are built, were not part of the recorded live run, and no result for them is claimed here.
+- **Deliverability.** In the one test against a real mail provider, Nestor's first email to a Gmail address was delivered to the spam folder, and the reply was still received and read correctly once the recipient found it. The agent inbox is a new address on AgentMail's shared domain, and the first email carries a link to the Renter Passport on a generated hostname; both are likely factors. A landlord who does not check spam would never see the inquiry. Sending from a custom domain with SPF and DKIM records is the fix, and needs a paid AgentMail plan. It has not been done.
+- **Real landlords.** The real conversation path has been run end to end with mailboxes the project controls (see [What was checked](#what-was-checked)). No negotiation with an actual landlord is claimed.
+- **What has not been run on production.** Autopilot, the listing re-check cron, and a conversation with a non-demo landlord have not been run there. The demo landlord's second and third replies were checked as scripts and against the reply parser, not in a full live conversation.
 - **No automated tests, linter or CI.** The checks are `npm run typecheck`, the adversarial review and manual browser acceptance runs.
 - **Lease quotes.** For the bundled sample lease, every quoted clause is verified to appear verbatim in the text and dropped if it does not. For an uploaded PDF the text never reaches Nestor's code, so verbatim quoting rests on the prompt and the output schema.
 - **Typed addresses.** A renter can type any landlord address. It is checked for shape and against lists of dead mailboxes and portal domains, not verified to belong to the landlord.
