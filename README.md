@@ -242,9 +242,11 @@ The public query [renters.passport](convex/renters.ts) returns exactly 15 allow-
 
 ## Engineering notes
 
-**AgentMail is used two ways on purpose.** In `@agentmail/convex` 0.1.0 the component's HTTP helper reads `AGENTMAIL_API_KEY` from `process.env` inside the component, and the component declares no env that an app could bind. The package README says to set the key on the deployment. With Convex's typed component env, Nestor's reading is that an undeclared variable does not reach the component, so its send and inbox functions would fail with a missing-key error. This was not run to confirm it. Inbound needs no key. So inbound uses the component (signature check helper, dedupe by event id, storage, callback workpool) and outbound uses the REST API directly.
+**AgentMail is used two ways on purpose.** In `@agentmail/convex` 0.1.0 the component's HTTP helper reads `AGENTMAIL_API_KEY` from `process.env` inside the component, and the component declares no env that an app could bind. The package README says to set the key on the deployment. A Convex component does not inherit the app's environment, so the variable never reaches it. This was reproduced during research on a local Convex 1.46 deployment: a send was accepted and queued, then every attempt failed with a missing-key error, and `createInbox` could not be resolved from the app because the component exports it as an internal function. Inbound needs no key. So inbound uses the component (signature check helper, dedupe by event id, storage, callback workpool) and outbound uses the REST API directly.
 
 **The Firecrawl JSON schema is written by hand.** The schema crosses a Convex function boundary into the component, and Convex rejects object keys that start with `$`. A generated schema with `$schema`, `$ref` or `$defs` cannot be passed, so [LISTING_JSON_SCHEMA](convex/lib/listingSchema.ts) is plain JSON Schema with nullable types. For the same reason the Scout has a direct-API fallback: when the component call fails for a reason other than a Firecrawl error (page metadata with keys Convex refuses), the same request goes straight to the Firecrawl scrape endpoint.
+
+**The icons are drawn for Nestor.** All 71 icons are a custom family based on the logo mark: arched tops like its doorway, one diagonal corner like its roofline, and a single flat tint per glyph. They live in [src/components/icons](src/components/icons) and are exported under the names of the stock library they replaced, so the swap changed one import path per file and nothing else. Two independent reviewers looked at renders of the set and of real screens, and 27 glyphs were redrawn after five failed a "recognise it at 16px" check. A dev-only specimen page lists every icon at `/dev/icons.html`; it is not part of the production build.
 
 **No file uses `"use node"`.** The OpenAI SDK, the AgentMail REST calls and the webhook verification all run in Convex's default runtime with `fetch`. That avoids a second runtime and its cold starts, and it is why the lease PDF goes through the OpenAI Files API instead of being held in memory as base64.
 
@@ -348,6 +350,7 @@ convex/                 backend
 src/                    React 19 app
   pages/                11 pages, 8 of them lazy-loaded
   components/           dashboard, thread, listing, lease, passport, onboarding, settings, landing
+  components/icons/     the custom icon family (71 icons) and its dev specimen
   index.css             all design tokens in one Tailwind CSS 4 theme block
 scripts/                env:push and auth:keys
 docs/screenshots/       captures of the live site with fictional data
