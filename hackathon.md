@@ -3,16 +3,16 @@
 - **Project:** Nestor
 - **Event:** Convex All Gas Hackathon
 - **What it does:** An AI concierge for apartment hunting that reads rental listings, emails landlords from its own inbox, negotiates terms, books tours, and checks a lease for bad clauses.
-- **Live app:** not deployed
+- **Live app:** https://standing-elephant-306.convex.site
 - **Repo:** https://github.com/mrnetwork0001/Nestor
 - **Frontend:** Convex static hosting
-- **Convex deployment:** not deployed
+- **Convex deployment:** https://standing-elephant-306.convex.cloud
 - **Components:** @convex-dev/static-hosting, @convex-dev/rate-limiter, @firecrawl/firecrawl-convex, @agentmail/convex
 - **Convex features:** schema, tables, indexes, queries, mutations, actions, HTTP actions, crons, scheduled functions, file storage, realtime queries
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-5.6-terra, gpt-5.6-sol
 - **Started:** 2026-08-28T07:46:38Z
-- **Last updated:** 2026-09-20T13:11:05Z
+- **Last updated:** 2026-09-20T13:28:37Z
 
 ## Log
 
@@ -77,3 +77,13 @@ script but has not published a site. Convex features: realtime queries (`src/`, 
 A four-lens review of the backend (authorization, the mail state machine, prompt safety, Convex limits)
 confirmed 25 findings and all were fixed before these commits, including missing deployment-wide spend caps
 and autopilot replying to auto-replies.
+
+### 2026-09-20 - b0987b1
+Deployed. The backend runs on the production Convex deployment and the frontend is served by the static
+hosting component at the convex.site URL above. Production has its own keys and Convex Auth signing keys,
+and the AgentMail webhook is registered against the production site URL with its signing secret stored on
+the deployment; an unsigned POST to `/agentmail/webhook` returns 401. A browser walk-through on the live URL
+took a guest from onboarding through a negotiation with the demo landlord, where the reply arrived through
+the signed webhook, to a booked tour, then upgraded the guest to an account and signed back in with the data
+intact. Added the logo artwork and favicon, and fixed the one-command deploy, which failed because the static
+hosting CLI calls `convex deploy` without `-y` (`package.json`, `src/components/Logo.tsx`).
