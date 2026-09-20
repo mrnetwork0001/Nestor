@@ -6,7 +6,9 @@ import type { MutationCtx } from "../_generated/server";
 /*
  * The live site is public and lets guests in, so everything that spends
  * credits or sends email is capped. Per-renter limits are keyed by renter id;
- * "global" limits protect the shared quotas (AgentMail free tier: 100 emails/day).
+ * "global" limits protect the shared quotas. AgentMail's free plan is 3,000
+ * emails a month; its public pricing page has also listed 100 a day, so the two
+ * global email caps together stay under 100.
  *
  *   await limits.limit(ctx, "scrapeListing", { key: renter._id, throws: true });
  */
@@ -20,10 +22,13 @@ const definitions = {
   draftEmail: { kind: "token bucket", rate: 40, period: HOUR, capacity: 10 },
   // Real email to an address outside Nestor. Account holders only.
   sendExternalEmail: { kind: "fixed window", rate: 6, period: DAY },
-  globalExternalEmail: { kind: "fixed window", rate: 35, period: DAY },
+  // Only account holders reach this, so it needs far less room than the demo.
+  globalExternalEmail: { kind: "fixed window", rate: 15, period: DAY },
   // Real email between Nestor's own two inboxes (the demo landlord).
   sendSimEmail: { kind: "fixed window", rate: 12, period: DAY },
-  globalSimEmail: { kind: "fixed window", rate: 50, period: DAY },
+  // Both directions count, about six per demo conversation. Past this the demo
+  // landlord answers inside Convex, labelled as such.
+  globalSimEmail: { kind: "fixed window", rate: 80, period: DAY },
 
   // Lease audit (the most expensive OpenAI call)
   leaseAudit: { kind: "fixed window", rate: 5, period: DAY },
