@@ -20,17 +20,26 @@ function needsYouDetail(breakdown: Summary["needsYouBreakdown"]): string {
   return parts.length > 0 ? parts.join(", ") : "Nothing is waiting on you";
 }
 
+/** Says how much of a result came from Nestor's demo landlord, or nothing when none of it did. */
+function demoHint(demoPart: number, total: number): string | undefined {
+  if (demoPart <= 0 || total <= 0) return undefined;
+  return demoPart >= total ? "with the demo landlord" : "includes the demo landlord";
+}
+
 function Tile({
   icon,
   label,
   value,
   detail,
+  hint,
   highlight = false,
 }: {
   icon: ReactNode;
   label: string;
   value: string;
   detail: string;
+  /** An honesty note. Unlike the caption it never steps aside, because a demo result must not read as a real one. */
+  hint?: string;
   highlight?: boolean;
 }) {
   return (
@@ -50,6 +59,7 @@ function Tile({
       </p>
       {/* Beside the activity feed the tiles sit six across and get narrow, so the caption steps aside there. */}
       <p className="mt-0.5 text-xs leading-snug text-ink-soft xl:sr-only 2xl:not-sr-only">{detail}</p>
+      {hint && <p className="mt-0.5 text-[0.6875rem] font-medium leading-snug text-honey">{hint}</p>}
     </div>
   );
 }
@@ -91,12 +101,31 @@ export function StatRow({ summary }: { summary: Summary | undefined }) {
         label="Tours"
         value={String(summary.toursBooked)}
         detail="booked"
+        hint={demoHint(summary.toursBookedDemo, summary.toursBooked)}
       />
+      {/* A waived fee is a win too. When no rent has come down yet, show what was won instead of $0. */}
       <Tile
         icon={<PiggyBank className="size-4" />}
-        label="Saved"
-        value={money(summary.monthlySavings)}
-        detail="a month off asking rent, so far"
+        label={summary.monthlySavings === 0 && summary.concessionsWon > 0 ? "Won" : "Saved"}
+        value={
+          summary.monthlySavings === 0 && summary.concessionsWon > 0
+            ? String(summary.concessionsWon)
+            : money(summary.monthlySavings)
+        }
+        detail={
+          summary.monthlySavings === 0 && summary.concessionsWon > 0
+            ? summary.concessionsWon === 1
+              ? "concession agreed by a landlord"
+              : "concessions agreed by landlords"
+            : summary.concessionsWon > 0
+              ? `a month off asking rent, plus ${summary.concessionsWon} other ${summary.concessionsWon === 1 ? "concession" : "concessions"}`
+              : "a month off asking rent, so far"
+        }
+        hint={
+          summary.monthlySavings === 0 && summary.concessionsWon > 0
+            ? demoHint(summary.concessionsWonDemo, summary.concessionsWon)
+            : demoHint(summary.monthlySavingsDemo, summary.monthlySavings)
+        }
       />
       <Tile
         icon={<BellRing className="size-4" />}

@@ -24,6 +24,14 @@ const summaryShape = v.object({
   replies: v.number(), // landlord emails received
   toursBooked: v.number(),
   monthlySavings: v.number(), // sum of (asked - best offer) across live conversations
+  // The share of the two results above that came from Nestor's demo landlord, so the tiles can say so.
+  // Both are already counted in toursBooked and monthlySavings; they are never added on top.
+  toursBookedDemo: v.number(),
+  monthlySavingsDemo: v.number(),
+  // Things a landlord agreed to that are not a lower rent (a waived fee, free parking), which
+  // monthlySavings cannot show. concessionsWonDemo is the part won from the demo landlord.
+  concessionsWon: v.number(),
+  concessionsWonDemo: v.number(),
   needsYou: v.number(),
   needsYouBreakdown: v.object({
     drafts: v.number(),
@@ -45,6 +53,10 @@ export const summary = query({
         replies: 0,
         toursBooked: 0,
         monthlySavings: 0,
+        toursBookedDemo: 0,
+        monthlySavingsDemo: 0,
+        concessionsWon: 0,
+        concessionsWonDemo: 0,
         needsYou: 0,
         needsYouBreakdown: { drafts: 0, questions: 0, tours: 0 },
       };
@@ -81,16 +93,25 @@ export const summary = query({
     ]);
 
     const over = new Set<Id<"threads">>();
+    const demo = new Set<Id<"threads">>();
     let monthlySavings = 0;
+    let monthlySavingsDemo = 0;
+    let concessionsWon = 0;
+    let concessionsWonDemo = 0;
     let questions = 0;
     for (const thread of threads) {
+      if (thread.isSimulated) demo.add(thread._id);
       if (OVER.has(thread.stage)) {
         over.add(thread._id);
         continue;
       }
       if (thread.rentAsked !== undefined && thread.rentBestOffer !== undefined) {
-        monthlySavings += Math.max(0, thread.rentAsked - thread.rentBestOffer);
+        const saved = Math.max(0, thread.rentAsked - thread.rentBestOffer);
+        monthlySavings += saved;
+        if (thread.isSimulated) monthlySavingsDemo += saved;
       }
+      concessionsWon += thread.concessionsWon.length;
+      if (thread.isSimulated) concessionsWonDemo += thread.concessionsWon.length;
       if (thread.openQuestions.length > 0) questions += 1;
     }
 
@@ -101,7 +122,9 @@ export const summary = query({
 
     const pendingDrafts = drafts.filter((m) => !over.has(m.threadId)).length;
     const proposedTours = tours.filter((t) => t.status === "proposed" && !over.has(t.threadId)).length;
-    const toursBooked = tours.filter((t) => t.status === "confirmed" || t.status === "completed").length;
+    const booked = tours.filter((t) => t.status === "confirmed" || t.status === "completed");
+    const toursBooked = booked.length;
+    const toursBookedDemo = booked.filter((t) => demo.has(t.threadId)).length;
 
     return {
       listings: listings.length,
@@ -109,6 +132,10 @@ export const summary = query({
       replies: received.length,
       toursBooked,
       monthlySavings: Math.round(monthlySavings),
+      toursBookedDemo,
+      monthlySavingsDemo: Math.round(monthlySavingsDemo),
+      concessionsWon,
+      concessionsWonDemo,
       needsYou: pendingDrafts + questions + proposedTours,
       needsYouBreakdown: { drafts: pendingDrafts, questions, tours: proposedTours },
     };
