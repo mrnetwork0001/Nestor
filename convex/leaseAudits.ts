@@ -26,7 +26,7 @@ const ORPHAN_AFTER_MS = 2 * 60 * 60 * 1000;
 // these caps the sample falls back to the pre-written review, labelled as such.
 const sampleLimits = new RateLimiter(components.rateLimiter, {
   sampleLeaseAudit: { kind: "fixed window", rate: 3, period: DAY },
-  sampleLeaseAuditGlobal: { kind: "fixed window", rate: 60, period: DAY },
+  sampleLeaseAuditGlobal: { kind: "fixed window", rate: 25, period: DAY },
 });
 
 function cleanFileName(raw: string): string {

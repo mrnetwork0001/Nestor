@@ -37,11 +37,13 @@ const definitions = {
 
   // Deployment-wide ceilings, no key. Guests are one click to create, so the per-renter
   // limits above do not bound what the shared Firecrawl and OpenAI keys can be made to spend.
-  globalScrape: { kind: "fixed window", rate: 150, period: DAY },
-  globalDiscover: { kind: "fixed window", rate: 30, period: DAY },
-  globalFindContact: { kind: "fixed window", rate: 40, period: DAY },
-  globalLeaseAudit: { kind: "fixed window", rate: 25, period: DAY },
-  globalDraft: { kind: "fixed window", rate: 300, period: DAY },
+  // Sized to the Firecrawl balance: a listing costs about 5 credits, so 40 a day is about 200.
+  globalScrape: { kind: "fixed window", rate: 40, period: DAY },
+  globalDiscover: { kind: "fixed window", rate: 10, period: DAY },
+  globalFindContact: { kind: "fixed window", rate: 10, period: DAY },
+  // An uploaded lease is the most expensive OpenAI call, roughly 30 to 40 cents.
+  globalLeaseAudit: { kind: "fixed window", rate: 10, period: DAY },
+  globalDraft: { kind: "fixed window", rate: 150, period: DAY },
   globalUploadUrl: { kind: "fixed window", rate: 150, period: DAY },
   // Paid readings of landlord mail, keyed by thread, so a mail loop cannot run up the bill.
   inboundAnalysis: { kind: "fixed window", rate: 12, period: DAY },
