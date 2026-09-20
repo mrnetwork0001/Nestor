@@ -90,7 +90,7 @@ export function AppShell() {
       <aside className="hidden border-r border-line bg-paper-deep/50 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:self-start lg:overflow-y-auto lg:overflow-x-hidden">
         <div className={cn("flex items-start py-5", collapsed ? "flex-col items-center gap-3 px-2" : "justify-between px-5")}>
           {collapsed ? (
-            <Logo className="[&>span]:hidden" />
+            <Logo variant="mark" size="h-8" />
           ) : (
             <div>
               <Logo />

@@ -43,7 +43,7 @@ export function LandingNav() {
       )}
     >
       <div className="mx-auto flex h-16 w-full max-w-[calc(75vw+19rem)] items-center justify-between gap-3 px-5 sm:px-4">
-        <Logo />
+        <Logo variant="lockup" size="h-12" />
 
         <nav aria-label="On this page" className="hidden items-center gap-8 md:flex">
           {SECTIONS.map((section) => (

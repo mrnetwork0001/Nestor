@@ -13,7 +13,7 @@ export function Footer({ destination }: { destination: string }) {
       <div className="mx-auto w-full max-w-[calc(50vw+38rem)] px-5 py-14 sm:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,5fr)_minmax(0,3fr)_minmax(0,3fr)]">
           <div>
-            <Logo />
+            <Logo variant="lockup" size="h-20" />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-ink-soft">
               An apartment-hunting concierge that scouts listings, writes to landlords, lines up
               tours and checks the lease. You make every decision.
