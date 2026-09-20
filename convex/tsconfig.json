@@ -1,0 +1,23 @@
+{
+  /* Convex functions are their own TypeScript project, separate from the Vite app. */
+  "compilerOptions": {
+    "allowJs": true,
+    "strict": true,
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    /* TypeScript 7 no longer auto-includes @types/*; auth.config.ts reads process.env. */
+    "types": ["node"],
+
+    /* Required by Convex */
+    "target": "ESNext",
+    "lib": ["ES2023", "dom"],
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "include": ["./**/*"],
+  "exclude": ["./_generated"]
+}
