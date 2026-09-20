@@ -5,6 +5,7 @@ import { Badge, Callout, Spinner } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { dateTime } from "@/lib/format";
 import { AnalysisPanel, AnalysisPending } from "./AnalysisPanel";
+import { DeliveryDetails } from "./DeliveryDetails";
 
 type Message = Doc<"messages">;
 
@@ -140,6 +141,10 @@ export function MessageCard({
               <ChannelBadge message={message} />
             )}
           </div>
+          {/* Only a message that actually went or arrived has a delivery record to show. */}
+          {(message.status === "sent" || message.status === "received") && (
+            <DeliveryDetails message={message} className="mt-2" />
+          )}
           {message.status === "failed" && (
             <Callout tone="clay" className="mt-3">
               {message.error ?? "This email could not be sent."}
