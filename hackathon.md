@@ -12,7 +12,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-5.6-terra, gpt-5.6-sol
 - **Started:** 2026-08-28T07:46:38Z
-- **Last updated:** 2026-09-20T14:50:41Z
+- **Last updated:** 2026-09-20T16:38:13Z
 
 ## Log
 
@@ -99,3 +99,24 @@ corner and a single flat tint. They are exported under the names of the library 
 changed one import line each, and the stock library was removed. Two reviewers looked at renders of the set
 and of real screens, and 27 glyphs were redrawn after five failed to read at 16px. Redeployed, and the browser
 walk-through passed again on the live URL (`src/components/icons/`, `src/components/landing/Motif.tsx`).
+
+### 2026-09-20 - 00a2c80
+Audited the app for anything simulated and fixed what it found. Five independent reviews (what is real and
+what is labelled demo content, how much each sponsor does on the default path, infrastructure and quotas, the
+real paths run live on production, and a walk-through with no access to the code) confirmed the integrations
+are real and that no server other than Convex is needed. They also found that the default path never called
+Firecrawl, that the demo never showed a concession, and that an OpenAI label could be shown when pattern
+matching had read the reply.
+
+The empty board now leads with a live Firecrawl search. The demo landlord's first reply answers the ask with
+one modest concession tied to the listing's real numbers. Every reading and every draft records who produced
+it, and the labels read that record. Each email has a delivery record with its AgentMail message id and
+thread id. Building pages are read one floor plan at a time, after a page was read with the rent of one plan
+and the size of another. Daily caps were resized to the actual sponsor balances (`convex/landlordSim.ts`,
+`convex/negotiator.ts`, `src/components/thread/DeliveryDetails.tsx`, `convex/lib/listingSchema.ts`,
+`convex/lib/limits.ts`).
+
+The real conversation path ran on production with a personal Gmail mailbox as the landlord: the inquiry was
+delivered and landed in the spam folder, and a reply typed in Gmail came back through the signed webhook and
+was read correctly into a counter-offer, a waived fee, two tour times and a question held for the renter.
+Redeployed, and the browser walk-through passed on the live URL.
