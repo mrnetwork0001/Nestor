@@ -10,6 +10,7 @@
 
 import type * as activity from "../activity.js";
 import type * as agentmailApi from "../agentmailApi.js";
+import type * as auditLandlord from "../auditLandlord.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as dashboard from "../dashboard.js";
@@ -49,6 +50,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   activity: typeof activity;
   agentmailApi: typeof agentmailApi;
+  auditLandlord: typeof auditLandlord;
   auth: typeof auth;
   crons: typeof crons;
   dashboard: typeof dashboard;
