@@ -232,9 +232,9 @@ The live site is public and a guest session is one click, so everything that spe
 
 | Action | Per renter | Whole deployment |
 | --- | --- | --- |
-| Listing scrapes | 12 per hour, burst 6 | 40 per day |
-| Discovery searches | 4 per hour | 10 per day |
-| Contact lookups | 8 per hour | 10 per day |
+| Listing scrapes | 12 per hour, burst 6 | 150 per day |
+| Discovery searches | 4 per hour | 30 per day |
+| Contact lookups | 8 per hour | 40 per day |
 | Drafts | 40 per hour, burst 10 | 150 per day |
 | Email to real landlords | 6 per day | 15 per day |
 | Email to the demo landlord | 12 per day | 80 per day |
