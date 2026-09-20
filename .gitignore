@@ -1,0 +1,18 @@
+# Dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Secrets and local deployment config. Never commit these.
+.env
+.env.*
+!.env.example
+
+# Convex local backend state
+.convex/
+
+# Editor and OS
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+*.log
