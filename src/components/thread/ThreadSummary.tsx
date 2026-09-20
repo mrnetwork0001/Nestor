@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check } from "@/components/icons";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import { money } from "@/lib/format";
 

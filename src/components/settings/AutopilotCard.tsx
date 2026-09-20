@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { Check } from "lucide-react";
+import { Check } from "@/components/icons";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import { Badge, Card, Skeleton } from "@/components/ui";

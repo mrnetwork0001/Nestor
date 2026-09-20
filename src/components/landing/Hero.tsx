@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { ArrowDown, Check } from "lucide-react";
+import { ArrowDown, Check } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { DraftFragment, FeedFragment, ListingFragment, ReplyFragment } from "./fragments";
 import { LinkButton } from "./LinkButton";

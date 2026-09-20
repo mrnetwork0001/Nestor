@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { House } from "lucide-react";
+import { House } from "@/components/icons";
 import { cn } from "@/lib/cn";
 
 /**

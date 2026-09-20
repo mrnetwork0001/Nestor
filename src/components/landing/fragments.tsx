@@ -10,7 +10,7 @@ import {
   PawPrint,
   PenLine,
   TriangleAlert,
-} from "lucide-react";
+} from "@/components/icons";
 import { Badge } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { money } from "@/lib/format";

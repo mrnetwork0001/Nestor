@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@/components/icons";
 import { Link } from "react-router";
 import { Logo } from "@/components/Logo";
 

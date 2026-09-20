@@ -8,7 +8,7 @@ import {
   IdCard,
   LayoutDashboard,
   Settings2,
-} from "lucide-react";
+} from "@/components/icons";
 import { NavLink, Outlet } from "react-router";
 import { api } from "../../convex/_generated/api";
 import { Logo } from "@/components/Logo";

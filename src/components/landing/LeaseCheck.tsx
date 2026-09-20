@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check } from "@/components/icons";
 import { LeaseFlagFragment } from "./fragments";
 import { LinkButton } from "./LinkButton";
 import { FigCaption } from "./Motif";

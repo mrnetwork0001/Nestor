@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy } from "@/components/icons";
 import { toast } from "sonner";
 import { Button, type ButtonProps } from "@/components/ui";
 import { copyText } from "./leaseHelpers";

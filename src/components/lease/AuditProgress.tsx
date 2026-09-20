@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check } from "@/components/icons";
 import { Badge, Card } from "@/components/ui";
 import { CHECKLIST, elapsedLabel, useNow, type Audit } from "./leaseHelpers";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { ArrowLeft, ExternalLink, MapPin, RefreshCw, SearchX, TriangleAlert } from "lucide-react";
+import { ArrowLeft, ExternalLink, MapPin, RefreshCw, SearchX, TriangleAlert } from "@/components/icons";
 import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";

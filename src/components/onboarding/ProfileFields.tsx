@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from "react";
-import { Check, Lock, Minus, Plus } from "lucide-react";
+import { Check, Lock, Minus, Plus } from "@/components/icons";
 import { Chip, Field, Input, Select, Textarea } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { CREDIT_LABEL, GOAL_LABEL, INCOME_LABEL } from "@/lib/format";

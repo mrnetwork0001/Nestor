@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Check, CircleAlert } from "lucide-react";
+import { Check, CircleAlert } from "@/components/icons";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import { Card } from "@/components/ui";
 import { dayLabel, money } from "@/lib/format";

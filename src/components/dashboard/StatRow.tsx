@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { FunctionReturnType } from "convex/server";
-import { BellRing, CalendarCheck, Home, MailCheck, PiggyBank, Send } from "lucide-react";
+import { BellRing, CalendarCheck, Home, MailCheck, PiggyBank, Send } from "@/components/icons";
 import type { api } from "../../../convex/_generated/api";
 import { Skeleton } from "@/components/ui";
 import { cn } from "@/lib/cn";

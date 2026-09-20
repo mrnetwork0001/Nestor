@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
-import { LogOut, TriangleAlert } from "lucide-react";
+import { LogOut, TriangleAlert } from "@/components/icons";
 import { Link } from "react-router";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";

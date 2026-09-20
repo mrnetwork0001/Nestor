@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { CalendarClock, Check, MessageCircleQuestionMark, Tag } from "lucide-react";
+import { CalendarClock, Check, MessageCircleQuestionMark, Tag } from "@/components/icons";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import { Badge, Spinner, type Tone } from "@/components/ui";
 import { money } from "@/lib/format";

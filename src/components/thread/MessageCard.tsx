@@ -1,5 +1,5 @@
 import { Fragment, useState, type ReactNode } from "react";
-import { ChevronDown, FlaskConical, Mail } from "lucide-react";
+import { ChevronDown, FlaskConical, Mail } from "@/components/icons";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import { Badge, Callout, Spinner } from "@/components/ui";
 import { cn } from "@/lib/cn";

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { Check, FileSearch, Lock } from "lucide-react";
+import { Check, FileSearch, Lock } from "@/components/icons";
 import { useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";

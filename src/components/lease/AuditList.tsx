@@ -1,4 +1,4 @@
-import { FileText } from "lucide-react";
+import { FileText } from "@/components/icons";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { Badge } from "@/components/ui";
 import { cn } from "@/lib/cn";

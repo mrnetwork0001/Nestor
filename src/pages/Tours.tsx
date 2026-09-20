@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
-import { ArrowRight, CalendarDays, CalendarPlus, MapPin } from "lucide-react";
+import { ArrowRight, CalendarDays, CalendarPlus, MapPin } from "@/components/icons";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";

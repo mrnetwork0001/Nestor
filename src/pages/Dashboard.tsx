@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { FlaskConical, House } from "lucide-react";
+import { FlaskConical, House } from "@/components/icons";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { ActivityFeed, LatestActivity } from "@/components/dashboard/ActivityFeed";

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from "@/components/icons";
 import type { ListingRow } from "@/components/listing/helpers";
 import { cn } from "@/lib/cn";
 import { STAGE_LABEL, STAGE_ORDER } from "@/lib/format";

@@ -1,5 +1,5 @@
 import { useState, type KeyboardEvent } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X } from "@/components/icons";
 import { Button, Input } from "@/components/ui";
 import { LIMITS } from "./profileDraft";
 

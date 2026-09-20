@@ -11,7 +11,7 @@ import {
   ScrollText,
   Users,
   Wallet,
-} from "lucide-react";
+} from "@/components/icons";
 import { cn } from "@/lib/cn";
 import { CREDIT_LABEL, INCOME_LABEL, dayLabel } from "@/lib/format";
 import { firstNameOf, type PassportFacts } from "./passportFacts";

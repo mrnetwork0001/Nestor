@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/components/icons";
 import { Badge } from "@/components/ui";
 import { money } from "@/lib/format";
 import { Eyebrow, FigCaption } from "./Motif";

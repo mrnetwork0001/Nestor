@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
-import { LogOut } from "lucide-react";
+import { LogOut } from "@/components/icons";
 import { Link, useNavigate } from "react-router";
 import { api } from "../../convex/_generated/api";
 import { Button } from "@/components/ui";

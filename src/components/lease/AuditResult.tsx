@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { ExternalLink, FileText, Mail, Scale, ShieldCheck, Trash2, TriangleAlert } from "lucide-react";
+import { ExternalLink, FileText, Mail, Scale, ShieldCheck, Trash2, TriangleAlert } from "@/components/icons";
 import { Link } from "react-router";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";

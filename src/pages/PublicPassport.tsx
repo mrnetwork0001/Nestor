@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { KeyRound, Printer } from "lucide-react";
+import { KeyRound, Printer } from "@/components/icons";
 import { Link, useParams } from "react-router";
 import { api } from "../../convex/_generated/api";
 import { Logo } from "@/components/Logo";

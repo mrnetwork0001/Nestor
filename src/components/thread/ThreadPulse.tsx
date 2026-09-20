@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Hourglass, Mail, PenLine } from "lucide-react";
+import { Hourglass, Mail, PenLine } from "@/components/icons";
 import { Link } from "react-router";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import { Callout } from "@/components/ui";

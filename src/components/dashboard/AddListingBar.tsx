@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useMutation } from "convex/react";
-import { Binoculars, FlaskConical, Link as LinkIcon } from "lucide-react";
+import { Binoculars, FlaskConical, Link as LinkIcon } from "@/components/icons";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import { Button, Callout, Card, Input } from "@/components/ui";

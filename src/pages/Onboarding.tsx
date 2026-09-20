@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { ArrowLeft, ArrowRight, Check, Lock, MailCheck, ScanSearch, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Lock, MailCheck, ScanSearch, ShieldCheck } from "@/components/icons";
 import { Navigate, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";

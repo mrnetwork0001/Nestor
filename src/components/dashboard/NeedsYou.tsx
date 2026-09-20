@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ArrowRight, CalendarClock, MessageCircleQuestionMark, PenLine } from "lucide-react";
+import { ArrowRight, CalendarClock, MessageCircleQuestionMark, PenLine } from "@/components/icons";
 import { Link } from "react-router";
 import { firstName, type ThreadRow, type TourRow } from "@/components/listing/helpers";
 import { cn } from "@/lib/cn";

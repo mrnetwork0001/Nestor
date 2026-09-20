@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Binoculars, CalendarCheck, FileSearch, House, Mail, PenLine, Radio } from "lucide-react";
+import { Binoculars, CalendarCheck, FileSearch, House, Mail, PenLine, Radio } from "@/components/icons";
 import { Link } from "react-router";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import { Skeleton } from "@/components/ui";

@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth } from "convex/react";
 import { ConvexError } from "convex/values";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "@/components/icons";
 import { Link, useNavigate } from "react-router";
 import { Logo } from "@/components/Logo";
 import { KeyMark } from "@/components/landing/Motif";

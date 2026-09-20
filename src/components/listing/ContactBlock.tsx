@@ -1,6 +1,6 @@
 import { useId, useState, type FormEvent } from "react";
 import { useMutation } from "convex/react";
-import { AtSign, ExternalLink, Phone, Search, UserRound } from "lucide-react";
+import { AtSign, ExternalLink, Phone, Search, UserRound } from "@/components/icons";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import type { Doc } from "../../../convex/_generated/dataModel";

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useQuery } from "convex/react";
 import type { FunctionReturnType } from "convex/server";
-import { Binoculars, Brain, Inbox } from "lucide-react";
+import { Binoculars, Brain, Inbox } from "@/components/icons";
 import { api } from "../../../convex/_generated/api";
 import { Badge, Card, Skeleton, type Tone } from "@/components/ui";
 import { CopyButton } from "@/components/lease/CopyButton";

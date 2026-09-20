@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@/components/icons";
 import { Logo } from "@/components/Logo";
 import { LinkButton } from "@/components/landing/LinkButton";
 import { RooflineRule } from "@/components/landing/Motif";

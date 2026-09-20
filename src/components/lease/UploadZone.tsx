@@ -1,6 +1,6 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useMutation } from "convex/react";
-import { FileText, UploadCloud } from "lucide-react";
+import { FileText, UploadCloud } from "@/components/icons";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";

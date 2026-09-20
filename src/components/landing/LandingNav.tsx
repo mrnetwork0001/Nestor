@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X } from "@/components/icons";
 import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/cn";
 

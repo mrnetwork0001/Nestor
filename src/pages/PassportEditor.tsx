@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { Check, Copy, ExternalLink, Eye, Lock, RefreshCw } from "lucide-react";
+import { Check, Copy, ExternalLink, Eye, Lock, RefreshCw } from "@/components/icons";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { useDocumentTitle } from "@/components/landing/useDocumentTitle";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
-import { PenLine, ShieldCheck } from "lucide-react";
+import { PenLine, ShieldCheck } from "@/components/icons";
 import { Link } from "react-router";
 import { api } from "../../../convex/_generated/api";
 import type { Doc } from "../../../convex/_generated/dataModel";

@@ -1,6 +1,6 @@
 import { useId, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import { useMutation } from "convex/react";
-import { Lightbulb, PenLine, Send, Trash2 } from "lucide-react";
+import { Lightbulb, PenLine, Send, Trash2 } from "@/components/icons";
 import { toast } from "sonner";
 import { api } from "../../../convex/_generated/api";
 import type { Doc } from "../../../convex/_generated/dataModel";
