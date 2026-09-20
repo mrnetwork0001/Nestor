@@ -17,9 +17,12 @@ import type { NegotiationGoal } from "./lib/validators";
  * labelled as a demo in the UI.
  *
  * Three beats, scripted so they work without OpenAI:
- *   1. friendly, offers two concrete tour times, asks one question
- *   2. concedes something modest tied to the renter's goals, holds firm elsewhere
- *   3. confirms the tour
+ *   1. friendly, answers the renter's ask with one modest concession, holds firm
+ *      elsewhere, offers two concrete tour times, asks at most one question
+ *   2. adds nothing new: the first offer stands, the tour is confirmed if one was chosen
+ *   3. confirms the tour and closes
+ * The concession comes first because most people who try the demo approve one
+ * email and read one reply: that reply has to show Nestor winning something.
  * With OpenAI the same beats are reworded in persona. After beat 3 it goes
  * quiet. Its answers enter the conversation through the same ingest as real
  * landlord email, and the Negotiator reads them the same way.
@@ -44,58 +47,112 @@ function tourTimes(city: string | undefined, now: number): Array<{ startsAt: num
   });
 }
 
-type Concession = { grant: string; firm: string };
+type Concession = { grant: string; firm: string; asked: boolean };
 
-/** Something modest the renter actually asked for, plus one thing the landlord will not move on. */
-function concessionFor(goals: NegotiationGoal[], listing: Doc<"listings">, hasPets: boolean): Concession {
-  const rent = listing.rentMonthly;
+// How each goal shows up in the email Nestor sent, so the landlord answers what was actually asked.
+const ASKED_IN_EMAIL: Record<NegotiationGoal, RegExp> = {
+  lower_rent:
+    /\brent\b[^.?!\n]{0,80}\b(?:flexib|come down|lower|reduc|negotia)|\b(?:flexib|lower|reduc|negotia)\w*[^.?!\n]{0,60}\b(?:rent|rate|price)\b/i,
+  waive_pet_fee: /\bpet (?:fee|deposit|rent)\b/i,
+  waive_application_fee: /\b(?:application|admin\w*) fee\b/i,
+  reduced_deposit: /\bdeposit\b[^.?!\n]{0,60}\b(?:reduc|lower|flexib)|\b(?:reduc|lower)\w*[^.?!\n]{0,40}\bdeposit\b/i,
+  flexible_move_in: /\bmove[- ]?in date\b|\b(?:lease|move[- ]?in)\b[^.?!\n]{0,40}\bstart|\bstart(?:ing)? on\b/i,
+  free_parking: /\bparking\b|\bgarage\b/i,
+  shorter_lease: /\b\d{1,2}[- ]months?\b/i,
+  longer_lease_discount: /\b\d{1,2}[- ]months?\b/i,
+};
+
+/**
+ * A round monthly reduction of at most 3.5 percent of asking: enough to show on the dashboard,
+ * small enough that a real landlord would plausibly say yes in a first reply.
+ */
+function rentCut(rent: number): number | null {
+  for (const step of [25, 10]) {
+    const cut = Math.floor((rent * 0.035) / step) * step;
+    if (cut >= step) return Math.min(cut, 150);
+  }
+  return null;
+}
+
+// The fallback parser reads "waive the [$350 ]pet fee" and nothing looser, so the fee is named in
+// plain words rather than by the listing's own label ("One-time pet charge" would not be read).
+function feeWords(kind: "pet" | "application", fee: { label: string; amount?: number }): string {
+  const noun =
+    kind === "pet"
+      ? /\brent\b/i.test(fee.label) ? "pet rent" : /\bdeposit\b/i.test(fee.label) ? "pet deposit" : "pet fee"
+      : /\badmin/i.test(fee.label) ? "admin fee" : "application fee";
+  return fee.amount !== undefined && fee.amount > 0 && fee.amount < 1000 ? `${dollars(fee.amount)} ${noun}` : noun;
+}
+
+/**
+ * One modest thing the renter asked for, plus what the landlord will not move on. Goals raised in
+ * the renter's email are tried first, then the rest in the renter's own order. Every wording here
+ * is also readable by heuristicAnalysis, so the win is recorded without OpenAI too.
+ */
+function concessionFor(sim: SimContext, email: string): Concession {
+  const { listing } = sim;
+  const rent = sim.thread.rentAsked ?? listing.rentMonthly;
+  const cut = rent !== undefined ? rentCut(rent) : null;
   const fee = (pattern: RegExp) => listing.fees.find((f) => pattern.test(f.label));
-  for (const goal of goals) {
+  const term = listing.leaseTermMonths ? ` on a ${listing.leaseTermMonths}-month lease` : "";
+  const lowerRent =
+    rent !== undefined && cut !== null
+      ? `I can take ${dollars(cut)} off the monthly rent, which brings it to ${dollars(rent - cut)} a month${term}`
+      : null;
+  const RENT_FIRM = "the monthly rent is firm at the listed price";
+  const DEPOSIT_FIRM = "the security deposit stays as listed";
+
+  const raised = sim.goals.filter((goal) => ASKED_IN_EMAIL[goal].test(email));
+  const ordered = [...raised, ...sim.goals.filter((goal) => !raised.includes(goal))];
+  for (const goal of ordered) {
+    const asked = raised.includes(goal);
     switch (goal) {
       case "lower_rent":
-        if (rent === undefined) break;
-        return {
-          grant: `I can take $50 off, which brings the rent to ${dollars(rent - 50)} a month on a 12-month lease`,
-          firm: "the security deposit stays as listed",
-        };
+        if (lowerRent === null) break;
+        return { grant: lowerRent, firm: DEPOSIT_FIRM, asked };
       case "waive_pet_fee": {
         const petFee = fee(/\bpet\b/i);
-        if (!hasPets || !petFee) break;
-        return { grant: `I can waive the ${petFee.label.toLowerCase()}`, firm: "the monthly rent is firm at the listed price" };
+        if (!sim.hasPets || !petFee) break;
+        return { grant: `I can waive the ${feeWords("pet", petFee)}`, firm: RENT_FIRM, asked };
       }
       case "waive_application_fee": {
         const applicationFee = fee(/application|admin/i);
         if (!applicationFee) break;
-        return { grant: `I can waive the ${applicationFee.label.toLowerCase()}`, firm: "the monthly rent is firm at the listed price" };
+        return { grant: `I can waive the ${feeWords("application", applicationFee)}`, firm: RENT_FIRM, asked };
       }
       case "reduced_deposit":
-        if (listing.deposit === undefined) break;
+        if (listing.deposit === undefined || listing.deposit < 200) break;
         return {
           grant: `I can reduce the security deposit to ${dollars(Math.round((listing.deposit * 0.75) / 25) * 25)}`,
-          firm: "the monthly rent is firm at the listed price",
+          firm: RENT_FIRM,
+          asked,
         };
       case "flexible_move_in":
-        return { grant: "I can be flexible on the move-in date by up to two weeks at no charge", firm: "the monthly rent is firm at the listed price" };
+        return { grant: "I can be flexible on the move-in date by up to two weeks at no charge", firm: RENT_FIRM, asked };
       case "free_parking": {
         const parking = fee(/parking|garage/i);
         if (!parking) break;
-        return { grant: "I can include parking free for the first six months", firm: "the monthly rent is firm at the listed price" };
+        return { grant: "I can include free parking for the first six months", firm: RENT_FIRM, asked };
       }
       case "shorter_lease":
-        return { grant: "I can offer a 9-month lease at the same monthly rate", firm: "the security deposit stays as listed" };
-      case "longer_lease_discount":
-        if (rent === undefined) break;
-        return { grant: `I can do ${dollars(rent - 40)} a month if you sign for 15 months`, firm: "the security deposit stays as listed" };
+        // A small landlord rarely shortens the term in a first reply: the believable answer is a
+        // no on the term and a little off the rent instead.
+        if (lowerRent === null) break;
+        return { grant: lowerRent, firm: "the lease length stays as listed", asked };
+      case "longer_lease_discount": {
+        if (rent === undefined || cut === null) break;
+        const months = sim.leaseTermMonths !== null && sim.leaseTermMonths > (listing.leaseTermMonths ?? 12) ? sim.leaseTermMonths : 15;
+        return { grant: `I can do ${dollars(rent - cut)} a month if you sign for ${months} months`, firm: DEPOSIT_FIRM, asked };
+      }
     }
   }
-  return rent !== undefined
-    ? { grant: `I can take $50 off, which brings the rent to ${dollars(rent - 50)} a month`, firm: "the security deposit stays as listed" }
-    : { grant: "I can be flexible on the move-in date by up to two weeks", firm: "the other terms stay as listed" };
+  return lowerRent !== null
+    ? { grant: lowerRent, firm: DEPOSIT_FIRM, asked: false }
+    : { grant: "I can be flexible on the move-in date by up to two weeks", firm: "the other terms stay as listed", asked: false };
 }
 
-// Half the personas ask something the Passport answers, half ask something only the renter knows,
-// so the demo shows both the Negotiator answering alone and it pausing for the renter.
-const PASSPORT_QUESTION = "How many people would be living in the home, and do you have any pets?";
+// Only the renter knows this one, so the demo shows the Negotiator pausing for its renter.
+// Half the demo landlords ask it; the other half ask nothing, so the first reply stays short.
 const RENTER_QUESTION = "Will you need a parking spot, and if so for how many cars?";
 
 type SimContext = {
@@ -103,6 +160,7 @@ type SimContext = {
   listing: Doc<"listings">;
   goals: NegotiationGoal[];
   hasPets: boolean;
+  leaseTermMonths: number | null;
   city: string;
   repliesSoFar: number;
   lastSent: Doc<"messages"> | null;
@@ -134,6 +192,7 @@ export const context = internalQuery({
       listing,
       goals: renter.negotiationGoals,
       hasPets: renter.pets.hasPets,
+      leaseTermMonths: renter.leaseTermMonths ?? null,
       city: listing.city ?? renter.city,
       repliesSoFar: history.filter((m) => m.direction === "inbound").length,
       lastSent: lastSent ?? null,
@@ -150,8 +209,15 @@ async function loadContext(ctx: ActionCtx, threadId: Id<"threads">): Promise<Sim
   return await ctx.runQuery(internal.landlordSim.context, { threadId });
 }
 
+type Script = {
+  points: string[];
+  body: string;
+  /** Wording a reworded reply has to carry verbatim: the tour times, which the Negotiator turns into calendar entries. */
+  verbatim: string[];
+};
+
 /** The scripted reply: the facts of the beat, in plain words. Also the brief handed to the model. */
-function script(sim: SimContext, now: number): { points: string[]; body: string } {
+function script(sim: SimContext, now: number, email: string): Script {
   const name = sim.thread.landlordName ?? "The leasing office";
   const firstName = name.split(/\s+/)[0];
   const home = sim.listing.title ?? sim.listing.address ?? "the apartment";
@@ -160,39 +226,49 @@ function script(sim: SimContext, now: number): { points: string[]; body: string 
 
   if (beat === 1) {
     const [first, second] = tourTimes(sim.city, now);
+    const { grant, firm, asked } = concessionFor(sim, email);
     const seed = [...sim.thread._id].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
-    const question = seed % 2 === 0 ? PASSPORT_QUESTION : RENTER_QUESTION;
+    // Asking about parking right after offering it free would read oddly.
+    const question = seed % 2 === 1 && !/parking/i.test(grant) ? RENTER_QUESTION : null;
+    const offer = asked
+      ? `On what you asked: ${grant}. I am not able to move on everything though, ${firm}.`
+      : `To make the decision easier: ${grant}. Beyond that, ${firm}.`;
     return {
       points: [
         `Thank them for the interest in ${home} and say it is still available.`,
+        `Grant exactly this concession, in these terms${asked ? ", as the answer to what they asked" : ""}: ${grant}.`,
+        `Hold firm on this: ${firm}.`,
         `Offer exactly these two tour times and no others: "${first.label}" or "${second.label}".`,
-        `Ask exactly this question: "${question}"`,
+        question ? `Ask exactly this question: "${question}"` : "Ask no questions.",
       ],
       body:
         `Hi,\n\nThanks for reaching out about ${home}. It is still available, and thank you for sending the renter profile, that makes my job easier.\n\n` +
-        `I can show the place on ${first.label} or ${second.label}. Let me know which works.\n\n` +
-        `${question}${sign}`,
+        `${offer}\n\n` +
+        `I can show the place on ${first.label} or ${second.label}. Let me know which works.` +
+        `${question ? `\n\n${question}` : ""}${sign}`,
+      verbatim: [first.label, second.label],
     };
   }
 
   if (beat === 2) {
-    const { grant, firm } = concessionFor(sim.goals, sim.listing, sim.hasPets);
+    // The concession was made in beat 1. Repeating its figures here would let it be read as a
+    // second, stacked offer, so this beat names no terms at all.
     const tourLine = sim.confirmedTour
       ? `You are confirmed for the tour on ${sim.confirmedTour}.`
       : sim.offeredTours.length > 0
         ? "Both tour times are still open, just tell me which one you would like."
         : "";
+    const stand = "What I offered in my last email stands, and that is as far as I can go. The other terms stay as listed.";
     return {
       points: [
         "Thank them for the details.",
-        `Grant exactly this concession, in these terms: ${grant}.`,
-        `Hold firm on this: ${firm}.`,
+        `Say exactly this and offer nothing new, with no figures: ${stand}`,
         tourLine ? `Say: ${tourLine}` : "",
       ].filter(Boolean),
-      body:
-        `Hi,\n\nThanks for the details, that all sounds good to me.\n\n` +
-        `I talked it over on my end: ${grant}. I am not able to move on everything though, ${firm}.` +
-        `${tourLine ? `\n\n${tourLine}` : ""}${sign}`,
+      // Not "sounds good": the fallback parser reads that as the landlord accepting terms, and
+      // the thread would jump to "terms agreed" on a reply that agrees to nothing new.
+      body: `Hi,\n\nThanks for the details, that is helpful to know.\n\n${stand}${tourLine ? `\n\n${tourLine}` : ""}${sign}`,
+      verbatim: sim.confirmedTour ? [sim.confirmedTour] : [],
     };
   }
 
@@ -205,11 +281,23 @@ function script(sim: SimContext, now: number): { points: string[]; body: string 
   return {
     points: [`Say: ${closing}`, "Say the terms offered earlier stand, and that you look forward to meeting."],
     body: `Hi,\n\n${closing}\n\nThe terms I offered earlier stand. Looking forward to meeting.${sign}`,
+    verbatim: held ? [held] : [],
   };
 }
 
+function dollarFigures(text: string): string[] {
+  return [...new Set([...text.matchAll(/\$\s?(\d[\d,]*)/g)].map((m) => m[1].replace(/,/g, "")))].sort();
+}
+
+/** True when a reworded reply carries the script's money and tour times, and no figure of its own. */
+function faithful(reworded: string, scripted: Script): boolean {
+  const flat = reworded.replace(/\s+/g, " ");
+  if (!scripted.verbatim.every((phrase) => flat.includes(phrase))) return false;
+  return dollarFigures(reworded).join("|") === dollarFigures(scripted.body).join("|");
+}
+
 async function compose(sim: SimContext, incoming: string): Promise<string> {
-  const scripted = script(sim, Date.now());
+  const scripted = script(sim, Date.now(), incoming);
   const client = getOpenAI();
   if (!client) return scripted.body;
   try {
@@ -236,8 +324,15 @@ async function compose(sim: SimContext, incoming: string): Promise<string> {
       });
       return requireParsed(response, "Demo landlord reply");
     });
-    const body = result.body.trim();
-    return body.length > 40 ? body.slice(0, 3000) : scripted.body;
+    const body = result.body.trim().slice(0, 3000);
+    if (body.length <= 40) return scripted.body;
+    // The model is told to copy prices and times exactly. When it does not, the script goes out
+    // instead: a wrong figure would be recorded as the landlord's offer.
+    if (!faithful(body, scripted)) {
+      console.warn("Demo landlord fell back to its script: the reworded reply changed a price or a tour time.");
+      return scripted.body;
+    }
+    return body;
   } catch (e) {
     console.warn(`Demo landlord fell back to its script: ${describeOpenAIError(e)}`);
     return scripted.body;
@@ -293,6 +388,10 @@ export const replyToEmail = internalAction({
     const boxes: Doc<"mailboxes">[] = await ctx.runQuery(internal.mail.mailboxes, {});
     const inbox = boxes.find((box) => box.role === "landlord_sim");
     const quota = await limits.limit(ctx, "globalSimEmail");
+    // Why the answer will not travel by email, for the activity feed. Unused when the email goes out.
+    let reason = !quota.ok
+      ? "The demo landlord has used its email allowance for today, so it is answering directly"
+      : "The demo landlord's inbox is not connected, so it is answering directly";
     if (inbox && quota.ok && agentmailLive()) {
       try {
         await replyToMessage({
@@ -305,8 +404,19 @@ export const replyToEmail = internalAction({
         return null;
       } catch (e) {
         console.warn(`Demo landlord could not reply by email, answering inside Convex: ${e instanceof Error ? e.message : String(e)}`);
+        reason = "The demo landlord's email reply did not go through, so it is answering directly";
       }
     }
+    // Only the watchdog used to explain this switch. Without a line here the reply simply
+    // appeared with no email behind it.
+    await ctx.runMutation(internal.activity.log, {
+      renterId: sim.thread.renterId,
+      kind: "system",
+      title: reason,
+      detail: "This reply stays inside Nestor instead of travelling by email. Real landlord threads are not affected.",
+      listingId: sim.thread.listingId,
+      threadId,
+    });
     await ctx.runMutation(internal.mail.ingestSimulated, { threadId, body });
     return null;
   },
