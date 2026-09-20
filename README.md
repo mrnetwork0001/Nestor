@@ -3,6 +3,8 @@
 An AI concierge for apartment hunting. Nestor reads rental listings, emails landlords from its own
 inbox, negotiates terms, books tours, and checks your lease for bad clauses before you sign.
 
+**Live: https://standing-elephant-306.convex.site** (choose Launch app, then Continue as guest)
+
 Built for the [Convex All Gas Hackathon](https://www.convex.dev/hackathons/all-gas) on Convex,
 Firecrawl, AgentMail and OpenAI. Build log: [hackathon.md](hackathon.md). Product and architecture:
 [NESTOR_PROJECT_SPEC.md](NESTOR_PROJECT_SPEC.md).
@@ -88,8 +90,12 @@ npx convex login                 # once, opens a browser
 npx convex dev                   # links the project and creates a cloud dev deployment
 npm run env:push -- --prod       # production has its own environment
 npm run auth:keys -- --prod
-npm run deploy                   # builds with the production URL and publishes the site
+npm run deploy                   # pushes the backend, builds with the production URL, publishes the site
 ```
+
+`npm run deploy` runs `convex deploy -y` and then `static-hosting deploy --skip-convex`. The static hosting
+CLI calls `convex deploy` without `-y`, which cannot prompt in a non-interactive shell, so the backend is
+pushed first.
 
 The app is then live at `https://<deployment-name>.convex.site`. To receive landlord replies there,
 register the webhook once and store the secret it returns:

@@ -14,7 +14,7 @@
     "typecheck": "tsc -b && tsc -p convex --noEmit",
     "env:push": "node scripts/push-env.mjs",
     "auth:keys": "node scripts/setup-auth-keys.mjs",
-    "deploy": "static-hosting deploy"
+    "deploy": "convex deploy -y && static-hosting deploy --skip-convex"
   },
   "dependencies": {
     "@agentmail/convex": "0.1.0",
