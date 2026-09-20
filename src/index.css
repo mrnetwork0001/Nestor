@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/figtree";
+
+/*
+ * Nestor design tokens. Warm paper, forest ink, one clay accent.
+ * Every colour in the app comes from here: use bg-paper, text-ink, bg-forest,
+ * text-clay and so on. Do not reach for Tailwind's default palette.
+ */
+@theme {
+  --font-display: "Fraunces Variable", ui-serif, Georgia, serif;
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: #faf6ef;
+  --color-paper-deep: #f2ebdf;
+  --color-card: #fffdf9;
+  --color-line: #e6dccb;
+  --color-line-strong: #cfc2ab;
+
+  --color-ink: #1c2621;
+  --color-ink-soft: #4a564f;
+  --color-ink-faint: #7d877f;
+
+  --color-forest: #1f4d3a;
+  --color-forest-deep: #163828;
+  --color-forest-soft: #dfeae3;
+  --color-moss: #5b7f6a;
+
+  --color-clay: #c2512f;
+  --color-clay-deep: #9d3f22;
+  --color-clay-soft: #f8e4db;
+
+  --color-honey: #b97d10;
+  --color-honey-soft: #fbefd2;
+
+  --color-sky: #2f6690;
+  --color-sky-soft: #e0ecf5;
+
+  --radius-card: 1.125rem;
+  --shadow-card: 0 1px 2px rgb(28 38 33 / 0.04), 0 8px 24px -12px rgb(28 38 33 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(28 38 33 / 0.06), 0 18px 40px -16px rgb(28 38 33 / 0.22);
+
+  --animate-rise: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(0.8);
+    }
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    min-height: 100dvh;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
+  }
+  ::selection {
+    background: var(--color-forest);
+    color: var(--color-paper);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-forest);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility paper-grain {
+  background-image: radial-gradient(rgb(28 38 33 / 0.035) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
