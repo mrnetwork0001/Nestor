@@ -12,7 +12,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-5.6-terra, gpt-5.6-sol
 - **Started:** 2026-08-28T07:46:38Z
-- **Last updated:** 2026-09-20T13:28:37Z
+- **Last updated:** 2026-09-20T14:50:41Z
 
 ## Log
 
@@ -87,3 +87,15 @@ took a guest from onboarding through a negotiation with the demo landlord, where
 the signed webhook, to a booked tour, then upgraded the guest to an account and signed back in with the data
 intact. Added the logo artwork and favicon, and fixed the one-command deploy, which failed because the static
 hosting CLI calls `convex deploy` without `-y` (`package.json`, `src/components/Logo.tsx`).
+
+### 2026-09-20 - 5604d6c
+Rewrote the README from facts extracted from the code, each with a file reference, then had three independent
+reviewers check it for technical truth, working links and commands, and tone; 20 of their 27 findings were
+confirmed and fixed. Added six screenshots of the live site taken with fictional data (`README.md`,
+`docs/screenshots/`).
+
+Replaced every stock icon with a custom family of 71 drawn from the logo mark: arched tops, one diagonal
+corner and a single flat tint. They are exported under the names of the library they replaced, so 47 files
+changed one import line each, and the stock library was removed. Two reviewers looked at renders of the set
+and of real screens, and 27 glyphs were redrawn after five failed to read at 16px. Redeployed, and the browser
+walk-through passed again on the live URL (`src/components/icons/`, `src/components/landing/Motif.tsx`).
