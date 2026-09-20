@@ -88,7 +88,8 @@ export function BuiltWith() {
                   aria-hidden
                   width={44}
                   height={44}
-                  loading="lazy"
+                  // Eager: 87kB for all four, and a lazy load leaves visibly
+                  // empty tiles for anyone who scrolls here quickly.
                   decoding="async"
                   className="h-11 w-11 shrink-0 rounded-xl border border-line object-cover"
                 />
