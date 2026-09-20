@@ -1,3 +1,4 @@
-# 🏡 NESTOR DIRECTIVE REDIRECT
+# Nestor
 
-This file redirects to **[ANTIGRAVITY_NESTOR.md](file:///Users/mrnetwork/Nestor/ANTIGRAVITY_NESTOR.md)** for master project directives.
+Agent directives are in [ANTIGRAVITY_NESTOR.md](ANTIGRAVITY_NESTOR.md). The product and architecture spec
+is [NESTOR_PROJECT_SPEC.md](NESTOR_PROJECT_SPEC.md).
