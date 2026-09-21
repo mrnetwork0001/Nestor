@@ -1,0 +1,5 @@
+node_modules/
+out/
+clips/tmp/
+public/clips/*.mp4
+.env
