@@ -40,9 +40,12 @@ BLUR_SMALL = 'boxblur=9:4:4:4'     # the 30px email field on the 1600px take
 TRACKED = {
     'draft': [
         # the Passport token in the draft editor, wrapped onto its own line.
-        # The body appears all at once at frame 281 -- nothing before that.
+        # The body first renders at frame 274, not 281 as this once said: the
+        # window started at 275 and left frame 274 carrying the whole token in
+        # the clear. It is out of shot in the cut, so no render was affected,
+        # but the clip on disk was not clean. Start early and leave margin.
         dict(band=(2148, 504), ref=(330, 862, 42), box=(516, 44, 2142, -2),
-             window=(275, 839), blur=BLUR_BIG),
+             window=(268, 839), blur=BLUR_BIG),
     ],
     'send-reply': [
         # the same line, while the draft is still on screen
@@ -63,6 +66,14 @@ TRACKED = {
 # The sign-in form does not scroll and the field never moves: one box, one span.
 # Frames are 1600x900 here, so the numbers are in that space.
 FIXED = {
+    # The body renders first on frame 274, not 281 as this once assumed, and
+    # the page is still settling: the tracker matched 230px above the real
+    # text and left the whole token readable for that one frame. The cut runs
+    # past it at 1.9x with the camera framed elsewhere, so no render showed
+    # it, but the clip on disk did. Keep the box tight to where the line
+    # actually sits while it settles -- a taller one reaches the Approve
+    # button a few frames later, which the cut does show.
+    'draft': [dict(box=(516, 120, 2142, 1536), frames=(270, 276), blur=BLUR_BIG)],
     # Two frames in the middle of the cross-fade carry both layouts at once,
     # each half-faded, so neither tracker owns them. One box over both
     # positions covers it; at 0.72x it is three frames of the cut.

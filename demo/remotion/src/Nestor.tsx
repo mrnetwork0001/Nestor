@@ -975,7 +975,11 @@ const S09: React.FC = () => (
 /* The Renter Passport, then the proof that the real path works. */
 
 const S10_SHOTS: Shot[] = [
-  { clip: 'passport', startFrom: 9.9, path: '/passport/117790b9…' }, // what a landlord opens
+  // What a landlord opens. The path is deliberately not the real token, not
+  // even its first characters: the link in the footage is dead and the backend
+  // rejects anything under 16 characters anyway, but a published video is no
+  // place for a fragment of one.
+  { clip: 'passport', startFrom: 9.9, path: '/passport/…' },
 ]
 const S10_FOCUS: Focus[] = [
   { rect: box(798, 390, 1.34), from: 0, to: sec(1.4) }, // the page a landlord opens
