@@ -4,6 +4,7 @@
 - **Event:** Convex All Gas Hackathon
 - **What it does:** An AI concierge for apartment hunting that reads rental listings, emails landlords from its own inbox, negotiates terms, books tours, and checks a lease for bad clauses.
 - **Live app:** https://standing-elephant-306.convex.site
+- **Demo video:** https://www.youtube.com/watch?v=hY4u_2ptL4U
 - **Repo:** https://github.com/mrnetwork0001/Nestor
 - **Frontend:** Convex static hosting
 - **Convex deployment:** https://standing-elephant-306.convex.cloud

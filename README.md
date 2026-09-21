@@ -2,7 +2,7 @@
 
 Nestor is an apartment-hunting assistant that reads rental listings, emails landlords from its own inbox, negotiates the terms you care about, books tours, and checks the lease before you sign.
 
-**[Live app](https://standing-elephant-306.convex.site)** · [Build log](hackathon.md) · [Product spec](NESTOR_PROJECT_SPEC.md)
+**[Live app](https://standing-elephant-306.convex.site)** · **[Demo video, 2:42](https://www.youtube.com/watch?v=hY4u_2ptL4U)** · [Build log](hackathon.md) · [Product spec](NESTOR_PROJECT_SPEC.md)
 
 Built for the [Convex All Gas Hackathon](https://www.convex.dev/hackathons/all-gas) on Convex, Firecrawl, AgentMail and OpenAI.
 
