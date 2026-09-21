@@ -1,0 +1,72 @@
+{
+ "dashboard": {
+  "duration": 21.77,
+  "width": 3200,
+  "height": 1800
+ },
+ "delivery": {
+  "duration": 13.53,
+  "width": 3200,
+  "height": 1800
+ },
+ "discover": {
+  "duration": 31.07,
+  "width": 1600,
+  "height": 900
+ },
+ "draft": {
+  "duration": 28,
+  "width": 3200,
+  "height": 1800
+ },
+ "landing": {
+  "duration": 26.87,
+  "width": 3200,
+  "height": 1800
+ },
+ "lease": {
+  "duration": 41.67,
+  "width": 3200,
+  "height": 1800
+ },
+ "listing": {
+  "duration": 22.13,
+  "width": 3200,
+  "height": 1800
+ },
+ "onboarding": {
+  "duration": 63.33,
+  "width": 1600,
+  "height": 900
+ },
+ "passport": {
+  "duration": 15.93,
+  "width": 3200,
+  "height": 1800
+ },
+ "send-reply": {
+  "duration": 23.57,
+  "width": 3200,
+  "height": 1800
+ },
+ "settings": {
+  "duration": 12.17,
+  "width": 3200,
+  "height": 1800
+ },
+ "signup": {
+  "duration": 17.27,
+  "width": 1600,
+  "height": 900
+ },
+ "tour": {
+  "duration": 18.4,
+  "width": 3200,
+  "height": 1800
+ },
+ "tours": {
+  "duration": 11.6,
+  "width": 3200,
+  "height": 1800
+ }
+}

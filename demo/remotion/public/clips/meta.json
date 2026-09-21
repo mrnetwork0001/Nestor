@@ -1,0 +1,443 @@
+{
+ "about": "Beat clips for the Nestor demo video. All times are seconds within each clip. Clips are 30 fps, H.264 yuv420p, bt709, no audio, with an injected pointer and a clay click ring. Most were re-filmed at device scale 2 and are 3200x1800; signup, onboarding and discover are the original 1600x900 takes and cannot be re-filmed. Every coordinate below -- regions, focus rectangles -- is in the 1600x900 CSS-pixel space of the page, whatever the clip's pixel size.",
+ "recorded": "2026-09-20, all on production (https://standing-elephant-306.convex.site) with the owner's spare account, registered on camera. Budget used: 1 discovery search, 1 demo-landlord conversation (first email + tour confirmation), 1 sample lease check. No real landlord was emailed. Browser timezone America/Chicago.",
+ "conventions": {
+  "spedUp": "ranges of the clip where a real wait was compressed; realSeconds is the true wait, factor the speed-up. Say \"sped up\" on screen if a range is shown.",
+  "moments": "clip time of each logged event, already mapped through any compression.",
+  "regions": "pixel boxes (in the 1600x900 clip) of things worth a punch-in, valid from validFrom until the next scroll.",
+  "layout": "app pages: sidebar 0-240px. Listing pages: photos and facts 280-846px, conversation column 880-1560px.",
+  "recut": "frames and marks for each production take are kept in clips/tmp/sessions/prod-<beat>; `TARGET=prod node scripts/capture.mjs recut <beat>` rebuilds a clip without touching the site."
+ },
+ "suggestedUse": {
+  "v02": "landing (scroll down 3.3-18.8, back up 20.1-23.5)",
+  "v03": "signup (whole, ~1.4x) then onboarding: step 1 budget note at 12.5, step 2 Passport preview 27-52, step 3 goals 54-59, dashboard 60.2. Onboarding is 63s real time: use 2-3 short cuts or 4-6x speed.",
+  "v04": "discover 2.5-21.5 (click 3.9, cards appear 5.7, first score 13.9, all scored 20.3), then listing 5-13 for \"scores every home and tells you why\"",
+  "v05": "draft: click 3.5, draft appears ~9.7, email readable 13.7-20, reasoning 20.9-26, pointer on Approve 26.8",
+  "v06": "send-reply whole: click 2.9, sent 3.1, round trip sped 6.8-10.8, reply 11.2, chips 17.6-23.9",
+  "v07": "delivery (ids 2.1-8, reply record 9.4-13.4) then tour (Choose 2.6, draft 7.3, approve 13.1, booked banner 15.2)",
+  "v08": "dashboard (tile 3.4, pipeline 7.2, feed 11.5, sidebar collapse 18.2 / expand 20.7); tours is a spare 7s navigation clip",
+  "v09": "lease: click 5.9, wait sped 8.9-12.9, result 14.1, clauses 18-32, not-legal-advice 32.7",
+  "v10": "passport (editor 2.4, landlord view 9.3). The hand-typed Gmail reply in v10 has no footage: it needs a still or motion graphic.",
+  "v11": "settings 5.4-12 works behind the sponsor roll-call (Scout/Firecrawl, Inbox/AgentMail, Brain/OpenAI all Live)"
+ },
+ "clips": {
+  "landing": {
+   "file": "clips/landing.mp4",
+   "duration": 26.87,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "The landing page from the hero: an eased glide down through every section to the footer, a faster glide back up, and the pointer coming to rest on \"Launch app\".",
+   "spedUp": [],
+   "moments": {
+    "scroll down begins": 3.27,
+    "bottom of page": 18.85,
+    "scroll back up begins": 20.15,
+    "back at the hero": 23.47
+   },
+   "regions": {},
+   "notes": []
+  },
+  "signup": {
+   "file": "clips/signup.mp4",
+   "duration": 17.27,
+   "size": "1600x900",
+   "fps": 30,
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "Landing hero, a click on \"Launch app\", the sign-in page, \"Create an account\", the email and password typed by hand, \"Create account\", and the first onboarding step opening.",
+   "spedUp": [],
+   "moments": {
+    "clicked Launch app": 2.54,
+    "sign-in page": 2.54,
+    "switched to Create your account": 5.7,
+    "email typed": 8.77,
+    "password typed": 10.86,
+    "clicked Create account": 11.92,
+    "onboarding opens": 13.27
+   },
+   "regions": {},
+   "notes": [
+    "Registration succeeded first time (no \"already exists\" path). A one-second \"Opening Nestor\" loader shows between Create account and onboarding (about 12.7-13.7).",
+    "The email is typed in full on screen; the password shows as dots."
+   ]
+  },
+  "onboarding": {
+   "file": "clips/onboarding.mp4",
+   "duration": 63.33,
+   "size": "1600x900",
+   "fps": 30,
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "All three onboarding steps filled in by hand: search (city, neighborhoods, private budget, must-haves, move-in), Passport facts with the live landlord preview on the right, negotiation goals, then \"Open my dashboard\" and the empty dashboard.",
+   "spedUp": [],
+   "moments": {
+    "name and city typed": 6.37,
+    "neighborhoods added": 11.63,
+    "maximum budget typed (private-budget note visible below)": 13.58,
+    "must-haves chosen": 21.63,
+    "step 1 complete": 26.57,
+    "step 2 opens": 28.24,
+    "introduction typed (Passport preview filling in)": 41.13,
+    "pet described": 46.9,
+    "step 2 complete": 52.73,
+    "step 3 opens": 54.49,
+    "goals chosen": 57.22,
+    "clicked Open my dashboard": 59.39,
+    "dashboard opens": 60.29
+   },
+   "regions": {},
+   "notes": [
+    "The date field shows day/month order (01/11/2026) because headless Chrome follows this Mac's region; the Passport preview reads \"Nov 1, 2026\".",
+    "Two goals were pre-selected by the app; only \"Waive pet fee or deposit\" is clicked on camera.",
+    "Must-haves live in step 1 of the real form, not step 3."
+   ]
+  },
+  "discover": {
+   "file": "clips/discover.mp4",
+   "duration": 31.07,
+   "size": "1600x900",
+   "fps": 30,
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "The empty dashboard, a click on \"Find real listings for me\" (a real Firecrawl web search), scouting cards appearing, then filling in live with photos, rent and match scores. Ends with the pointer on the first scored card.",
+   "spedUp": [
+    {
+     "what": "the rest of the cards filling in",
+     "clipFrom": 15.35,
+     "clipTo": 19.85,
+     "realSeconds": 14.85,
+     "factor": 3.3
+    },
+    {
+     "what": "an idle wait with nothing changing on screen (a bug in the wait condition, fixed since), cut out",
+     "clipFrom": 21.65,
+     "clipTo": 21.85,
+     "realSeconds": 82.06,
+     "factor": 410.32
+    }
+   ],
+   "moments": {
+    "clicked Find real listings for me": 3.88,
+    "scouting cards appear": 5.66,
+    "first scored card": 13.85,
+    "all cards scored": 20.25
+   },
+   "regions": {},
+   "notes": [
+    "4 scored cards on the board",
+    "The script waited about 80 seconds too long after the last card filled in; that idle stretch is removed from the clip.",
+    "At 21.65-21.85 about 80 idle seconds are cut out: relative times in the feed jump from \"10s ago\" to \"1m ago\". End the shot before 21.6 or start after 21.9 to hide it."
+   ]
+  },
+  "listing": {
+   "file": "clips/listing.mp4",
+   "duration": 22.13,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "From the board, a click on the best real listing; the listing page with photos and rent; a glide down to the match score with its reasons, the fees and facts, and the landlord contact section; then back to the top.",
+   "spedUp": [],
+   "moments": {
+    "clicked the listing card": 1.87,
+    "listing page open (photos, rent, title)": 2.66,
+    "match score and reasons": 7.38,
+    "fees and facts": 12.78,
+    "landlord contact section": 17.05,
+    "back at the top": 20.56
+   },
+   "regions": {},
+   "notes": []
+  },
+  "draft": {
+   "file": "clips/draft.mp4",
+   "duration": 28,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "The listing page, a click on the demo-landlord button, the Negotiator's draft appearing with the \"Written by OpenAI\" badge, a pause on the email (the AI-assistant disclosure is in its opening lines), a pause on \"Why Nestor wrote it this way\", and the pointer resting on \"Approve and send\".",
+   "spedUp": [],
+   "moments": {
+    "clicked the demo landlord button": 3.52,
+    "draft appears": 9.34,
+    "draft email readable (AI-disclosure sentence on screen)": 13.27,
+    "reasoning readable (Why Nestor wrote it this way)": 20.62,
+    "pointer on Approve and send (not clicked)": 26.3
+   },
+   "regions": {
+    "draft email body": {
+     "x": 897,
+     "y": 272,
+     "w": 645,
+     "h": 341,
+     "validFrom": 13.28
+    },
+    "why Nestor wrote it this way": {
+     "x": 897,
+     "y": 658,
+     "w": 645,
+     "h": 94,
+     "validFrom": 13.29
+    }
+   },
+   "notes": []
+  },
+  "send-reply": {
+   "file": "clips/send-reply.mp4",
+   "duration": 23.57,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "A click on \"Approve and send\", the draft turning into a sent email, the wait for the demo landlord (compressed), the reply arriving over real email, and the chips under \"What Nestor understood\" with the \"Read by OpenAI\" label.",
+   "spedUp": [
+    {
+     "what": "the email round trip through AgentMail to the demo landlord and back",
+     "clipFrom": 7.68,
+     "clipTo": 11.68,
+     "realSeconds": 10.76,
+     "factor": 2.69
+    }
+   ],
+   "moments": {
+    "clicked Approve and send": 2.88,
+    "email sent (sent state, AgentMail badge)": 3.07,
+    "reply arrives": 12.08,
+    "analysis appears": 15.64,
+    "chips visible (What Nestor understood, Read by OpenAI)": 17.5
+   },
+   "regions": {
+    "what Nestor understood": {
+     "x": 883,
+     "y": 305,
+     "w": 635,
+     "h": 229,
+     "validFrom": 17.51
+    }
+   },
+   "notes": []
+  },
+  "delivery": {
+   "file": "clips/delivery.mp4",
+   "duration": 13.53,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "\"Delivery details\" opened under the sent email and then under the landlord's reply: channel, AgentMail message id, AgentMail thread id, from, to, and the time to the second.",
+   "spedUp": [],
+   "moments": {
+    "delivery details open on the sent email": 2.13,
+    "delivery details open on the reply": 9.43
+   },
+   "regions": {
+    "delivery record (sent email)": {
+     "x": 937,
+     "y": 344,
+     "w": 606,
+     "h": 222,
+     "validFrom": 2.14
+    },
+    "delivery record (reply)": {
+     "x": 899,
+     "y": 386,
+     "w": 603,
+     "h": 222,
+     "validFrom": 9.45
+    }
+   },
+   "notes": []
+  },
+  "tour": {
+   "file": "clips/tour.mp4",
+   "duration": 18.4,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "The tour times the landlord offered, a click on \"Choose\", Nestor drafting the confirmation, \"Approve and send\", and the \"Tour booked\" state.",
+   "spedUp": [],
+   "moments": {
+    "clicked Choose on a tour time (the tour shows as booked at once)": 2.65,
+    "confirmation draft appears": 6.81,
+    "clicked Approve and send on the confirmation": 12.66,
+    "confirmation sent": 12.95,
+    "tour booked banner in view, under the sent confirmation": 14.75
+   },
+   "regions": {
+    "tour booked banner": {
+     "x": 879,
+     "y": 738,
+     "w": 681,
+     "h": 66,
+     "validFrom": 14.75
+    }
+   },
+   "notes": []
+  },
+  "dashboard": {
+   "file": "clips/dashboard.mp4",
+   "duration": 21.77,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "The dashboard, live. A second tab signed in as the same person approves a waiting draft; on camera the card rises out of \"Needs your OK\" into \"Awaiting reply\", the activity feed ticks, and when the demo landlord answers the card moves again into \"Negotiating\". Nothing is clicked or reloaded in the recorded tab.",
+   "spedUp": [
+    {
+     "what": "the demo landlord replying, on camera, with nothing touched",
+     "clipFrom": 7.75,
+     "clipTo": 10.75,
+     "realSeconds": 4.63,
+     "factor": 1.54
+    }
+   ],
+   "moments": {
+    "a second tab approved the draft (nothing is clicked or reloaded on camera)": 1.75,
+    "the card rises into Awaiting reply on its own": 2.05,
+    "the activity feed ticks": 4.65,
+    "the landlord replies and the card moves again, into Negotiating": 11.35,
+    "pointer beside the live activity feed": 16.1
+   },
+   "regions": {
+    "pipeline": {
+     "x": 272,
+     "y": 258,
+     "w": 948,
+     "h": 603,
+     "validFrom": 0.01
+    },
+    "live activity feed": {
+     "x": 1248,
+     "y": 8,
+     "w": 320,
+     "h": 852,
+     "validFrom": 0.01
+    }
+   },
+   "notes": [
+    "A second browser, signed in as the same person, approved the draft. The recorded tab was never clicked and never reloaded."
+   ]
+  },
+  "tours": {
+   "file": "clips/tours.mp4",
+   "duration": 11.6,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "Sidebar navigation to Tours: the times a landlord has offered and is waiting on a pick, then a glide down to the tours that are already booked.",
+   "spedUp": [],
+   "moments": {
+    "Tours page open": 2.23,
+    "the booked tours in view": 7.34
+   },
+   "regions": {
+    "coming up": {
+     "x": 504,
+     "y": 281,
+     "w": 832,
+     "h": 507,
+     "validFrom": 7.35
+    }
+   },
+   "notes": []
+  },
+  "lease": {
+   "file": "clips/lease.mp4",
+   "duration": 41.67,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "Sidebar navigation to Lease check, a real PDF chosen through the app's own file chooser, the upload and the \"Nestor is reading the fine print\" state, then the live OpenAI verdict (wait compressed), a glide through the flagged clauses -- each with the quoted sentence, why it matters and what to ask for -- and the \"Not legal advice\" box.",
+   "spedUp": [
+    {
+     "what": "OpenAI reading the lease end to end",
+     "clipFrom": 13.76,
+     "clipTo": 17.76,
+     "realSeconds": 52.88,
+     "factor": 13.22
+    }
+   ],
+   "moments": {
+    "Lease check open on \"Drop your lease PDF here\"": 2.91,
+    "chose a lease PDF": 6.35,
+    "the file name appears (pecan-hollow-lease.pdf) and the upload runs": 6.36,
+    "Nestor is reading the fine print (live, on the real upload)": 8.16,
+    "review appears (Overall risk)": 18.96,
+    "flagged clauses begin": 22.98,
+    "a flagged clause: quote, plain-language explanation, sentence to send back": 28.55,
+    "the \"Not legal advice\" box": 38.82
+   },
+   "regions": {
+    "upload zone": {
+     "x": 376,
+     "y": 193,
+     "w": 320,
+     "h": 294,
+     "validFrom": 2.92
+    },
+    "not legal advice": {
+     "x": 736,
+     "y": 753,
+     "w": 728,
+     "h": 108,
+     "validFrom": 37.76
+    }
+   },
+   "notes": []
+  },
+  "passport": {
+   "file": "clips/passport.mp4",
+   "duration": 15.93,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "Sidebar navigation to the Passport editor with the shareable link, then the public Passport exactly as a landlord sees it: bands and self-reported facts, never documents.",
+   "spedUp": [],
+   "moments": {
+    "Passport editor open": 2.89,
+    "public Passport open (the landlord's view)": 8.96
+   },
+   "regions": {},
+   "notes": []
+  },
+  "settings": {
+   "file": "clips/settings.mp4",
+   "duration": 12.17,
+   "size": "3200x1800",
+   "fps": 30,
+   "dpr": 2,
+   "sourceSpace": "1600x900 CSS pixels (FOCUS rectangles use these)",
+   "recordedOn": "production (standing-elephant-306.convex.site)",
+   "shows": "Sidebar navigation to Settings and the \"Nestor's agents\" integration status: AgentMail, Firecrawl and OpenAI each reporting live.",
+   "spedUp": [],
+   "moments": {
+    "Settings open": 2.88,
+    "integration status in view": 5.95
+   },
+   "regions": {
+    "Nestor's agents": {
+     "x": 568,
+     "y": 77,
+     "w": 704,
+     "h": 568,
+     "validFrom": 5.96
+    }
+   },
+   "notes": []
+  }
+ }
+}
